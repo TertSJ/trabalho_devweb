@@ -1,0 +1,48 @@
+Controle Financeiro Pessoal: Um app para cadastrar receitas e despesas, mostrando relatórios simples, com entradas validadas para valores e datas.
+
+Visão e Escopo do Projeto
+Defina claramente o objetivo da aplicação, o público-alvo e as regras do negócio. Exemplo:
+
+Aplicação para gerenciamento financeiro pessoal.
+
+Público: usuários que desejam controlar receitas e despesas.
+
+Regras: Permitir cadastro de receitas e despesas com campos obrigatórios, validação numérica e de datas.
+
+Relatórios básicos de saldo e movimentações.
+
+Modelagem de Dados - DER
+Crie o Diagrama Entidade Relacionamento com as principais entidades e relacionamentos.
+
+Exemplo para controle financeiro:
+
+Entidade Transação (id, tipo, valor, data, categoria, descrição).
+
+Entidade Categoria (id, nome).
+
+Relacionamento: cada transação pertence a uma categoria.
+
+Arquitetura do Sistema
+Defina o fluxo do sistema, desde a entrada de dados pelo usuário até a persistência no banco.
+
+Estabeleça o padrão de organização do código (MVC, camadas, etc.), separando front-end, back-end e banco.
+
+Exemplos:
+
+Front-end: HTML, CSS e JavaScript para interface e validação.
+
+Back-end: API que manipula dados e se conecta ao banco seguro.
+
+Desenvolvimento do Front-end
+Design acessível, responsivo e semântico, usando tags HTML corretas para facilitar a usabilidade e SEO.
+
+Validação no cliente usando JavaScript para garantir a experiência antes do envio dos dados.
+
+Feedback visual para erros ou sucesso nas operações.
+
+Desenvolvimento do Back-end
+Revalidação dos dados recebidos para segurança.
+
+Uso de Prepared Statements para proteger contra SQL injection.
+
+Operações CRUD completas para gerenciar os dados (create, read, update, delete).
