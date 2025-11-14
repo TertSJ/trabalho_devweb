@@ -1,139 +1,148 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Controle Financeiro Pessoal</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      max-width: 600px;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 8px;
-      margin-top: 4px;
-    }
-    .error {
-      color: red;
-      font-size: 0.9em;
-      display: none;
-      margin-top: 2px;
-    }
-    .btn-submit {
-      margin-top: 15px;
-      padding: 10px 15px;
-      background-color: #0275d8;
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
-    .btn-submit:hover {
-      background-color: #025aa5;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle Financeiro - Visualização</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
 </head>
 <body>
+    <div class="container">
+        <!-- Cabeçalho -->
+        <header class="header">
+            <h1><i class="fas fa-wallet"></i> Controle Financeiro</h1>
+            <p class="text-muted">Visualização de Transações Financeiras</p>
+        </header>
 
-  <h1>Controle Financeiro Pessoal</h1>
+        <!-- Mensagens -->
+        <div id="mensagens"></div>
 
-  <form id="finance-form" novalidate>
-    <label for="tipo">Tipo:</label>
-    <select id="tipo" name="tipo" required>
-      <option value="">Selecione</option>
-      <option value="receita">Receita</option>
-      <option value="despesa">Despesa</option>
-    </select>
-    <span class="error" id="tipo-error">Por favor, selecione o tipo.</span>
+        <!-- Resumo Financeiro -->
+        <div class="resumo-financeiro">
+            <div class="resumo-item">
+                <h3><i class="fas fa-arrow-up text-success"></i> Receitas</h3>
+                <div class="resumo-valor text-success" id="total-receitas">R$ 0,00</div>
+            </div>
+            <div class="resumo-item">
+                <h3><i class="fas fa-arrow-down text-danger"></i> Despesas</h3>
+                <div class="resumo-valor text-danger" id="total-despesas">R$ 0,00</div>
+            </div>
+            <div class="resumo-item">
+                <h3><i class="fas fa-wallet"></i> Saldo</h3>
+                <div class="resumo-valor" id="saldo">R$ 0,00</div>
+            </div>
+        </div>
 
-    <label for="valor">Valor (R$):</label>
-    <input type="number" id="valor" name="valor" step="0.01" min="0.01" placeholder="Ex: 150.00" required />
-    <span class="error" id="valor-error">Informe um valor maior que zero.</span>
+        <!-- Botão para adicionar nova transação -->
+        <div class="mb-4 text-end">
+            <a href="cadastro.html" class="btn btn-primary">
+                <i class="fas fa-plus-circle"></i> Nova Transação
+            </a>
+        </div>
 
-    <label for="data">Data:</label>
-    <input type="date" id="data" name="data" required />
-    <span class="error" id="data-error">Informe uma data válida.</span>
+        <!-- Filtros -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2><i class="fas fa-filter"></i> Filtros</h2>
+            </div>
+            <div class="card-body">
+                <form id="filtros-form" class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="filtro-data">Data</label>
+                        <input type="date" id="filtro-data" class="form-control">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="filtro-tipo">Tipo</label>
+                        <select id="filtro-tipo" class="form-control">
+                            <option value="">Todos</option>
+                            <option value="receita">Receita</option>
+                            <option value="despesa">Despesa</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="filtro-categoria">Categoria</label>
+                        <select id="filtro-categoria" class="form-control">
+                            <option value="">Todas</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-    <label for="categoria">Categoria:</label>
-    <input type="text" id="categoria" name="categoria" placeholder="Ex: Alimentação" required />
-    <span class="error" id="categoria-error">Categoria é obrigatória.</span>
+        <!-- Lista de Transações -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2><i class="fas fa-list"></i> Transações</h2>
+                <div>
+                    <button id="exportar-csv" class="btn btn-outline-secondary btn-sm me-2">
+                        <i class="fas fa-file-export"></i> Exportar CSV
+                    </button>
+                    <button id="recarregar" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-sync-alt"></i> Atualizar
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Descrição</th>
+                                <th>Categoria</th>
+                                <th class="text-center">Tipo</th>
+                                <th class="text-end">Valor</th>
+                                <th class="text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lista-transacoes">
+                            <!-- Transações serão inseridas aqui via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
-    <label for="descricao">Descrição:</label>
-    <textarea id="descricao" name="descricao" rows="3" placeholder="Descrição opcional"></textarea>
+        <!-- Rodapé -->
+        <footer class="rodape">
+            <p>© <span id="ano-atual"></span> Todos os direitos reservados</p>
+            <a href="https://movimentobemmaior.org.br/politica-de-privacidade/" target="_blank">Política de Privacidade</a>
+        </footer>
+    </div>
 
-    <button type="submit" class="btn-submit">Adicionar</button>
-  </form>
+    <!-- Modal de Confirmação -->
+    <div class="modal" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Exclusão</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmar-exclusao">Excluir</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-  <script>
-    document.getElementById('finance-form').addEventListener('submit', function(event) {
-      event.preventDefault();
-
-      let formIsValid = true;
-
-      // tipo
-      const tipo = document.getElementById('tipo');
-      const tipoError = document.getElementById('tipo-error');
-      if (tipo.value === '') {
-        tipoError.style.display = 'block';
-        formIsValid = false;
-      } else {
-        tipoError.style.display = 'none';
-      }
-
-      // valor
-      const valor = document.getElementById('valor');
-      const valorError = document.getElementById('valor-error');
-      if (valor.value === '' || parseFloat(valor.value) <= 0) {
-        valorError.style.display = 'block';
-        formIsValid = false;
-      } else {
-        valorError.style.display = 'none';
-      }
-
-      // data
-      const data = document.getElementById('data');
-      const dataError = document.getElementById('data-error');
-      if (data.value === '') {
-        dataError.style.display = 'block';
-        formIsValid = false;
-      } else {
-        dataError.style.display = 'none';
-      }
-
-      // categoria
-      const categoria = document.getElementById('categoria');
-      const categoriaError = document.getElementById('categoria-error');
-      if (categoria.value.trim() === '') {
-        categoriaError.style.display = 'block';
-        formIsValid = false;
-      } else {
-        categoriaError.style.display = 'none';
-      }
-
-      // Se tudo estiver válido, por enquanto apenas exibir os dados no console
-      if (formIsValid) {
-        const dados = {
-          tipo: tipo.value,
-          valor: parseFloat(valor.value).toFixed(2),
-          data: data.value,
-          categoria: categoria.value.trim(),
-          descricao: document.getElementById('descricao').value.trim()
-        };
-        console.log('Dados a cadastrar:', dados);
-        alert('Dados validados com sucesso! Agora você pode enviar ao servidor.');
-
-        // Aqui você pode adicionar código para enviar os dados ao back-end via fetch/AJAX
-
-        // Resetar formulário após envio
-        this.reset();
-      }
-    });
-  </script>
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="database.js" type="module"></script>
+    <script src="scripts.js" type="module"></script>
+    <script>
+        // Atualizar o ano atual no rodapé
+        document.getElementById('ano-atual').textContent = new Date().getFullYear();
+            
+        // Configurar o botão de recarregar
+        document.getElementById('recarregar').addEventListener('click', function() {
+            window.location.reload();
+        });
+    </script>
 </body>
 </html>

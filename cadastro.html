@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Transação - Controle Financeiro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Cabeçalho -->
+        <header class="header">
+            <h1><i class="fas fa-wallet"></i> Controle Financeiro</h1>
+            <p class="text-muted">Cadastro de Transações Financeiras</p>
+        </header>
+
+        <!-- Mensagens -->
+        <div id="mensagens"></div>
+
+        <!-- Card do Formulário -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-plus-circle"></i> Nova Transação</h2>
+                <a href="index.html" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left"></i> Voltar para Visualização
+                </a>
+            </div>
+            <div class="card-body">
+                <form id="transacao-form">
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="tipo">Tipo <span class="text-danger">*</span></label>
+                            <select id="tipo" name="tipo" class="form-control" required>
+                                <option value="">Selecione...</option>
+                                <option value="receita">Receita</option>
+                                <option value="despesa">Despesa</option>
+                            </select>
+                            <div class="error" id="tipo-error"></div>
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label for="valor">Valor <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                <input type="number" id="valor" name="valor" class="form-control" 
+                                       step="0.01" min="0.01" required>
+                            </div>
+                            <div class="error" id="valor-error"></div>
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label for="data">Data <span class="text-danger">*</span></label>
+                            <input type="date" id="data" name="data" class="form-control" required>
+                            <div class="error" id="data-error"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="categoria">Categoria <span class="text-danger">*</span></label>
+                            <input type="text" id="categoria" name="categoria" class="form-control" 
+                                   list="categorias" required>
+                            <datalist id="categorias">
+                                <!-- Categorias serão preenchidas via JavaScript -->
+                            </datalist>
+                            <div class="error" id="categoria-error"></div>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label for="descricao">Descrição</label>
+                            <textarea id="descricao" name="descricao" class="form-control" 
+                                     rows="2" placeholder="Detalhes adicionais"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Adicionar Transação
+                        </button>
+                        <button type="reset" class="btn btn-outline-secondary">
+                            <i class="fas fa-eraser"></i> Limpar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Rodapé -->
+        <footer class="rodape">
+            <p>© <span id="ano-atual"></span> Todos os direitos reservados</p>
+            <a href="https://movimentobemmaior.org.br/politica-de-privacidade/" target="_blank">Política de Privacidade</a>
+            <div class="mt-3">
+                <a href="index.html" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Voltar para a Página Inicial
+                </a>
+            </div>
+        </footer>
+        
+        <script>
+            // Atualizar o ano atual no rodapé
+            document.getElementById('ano-atual').textContent = new Date().getFullYear();
+        </script>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Exclusão</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmar-exclusao">Excluir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="database.js" type="module"></script>
+    <script src="scripts.js" type="module"></script>
+</body>
+</html>
