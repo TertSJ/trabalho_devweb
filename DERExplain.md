@@ -5,7 +5,7 @@ Aqui está uma explicação detalhada de cada parte do diagrama:
 ### 1. Entidade Central: USER (Usuário)
 A tabela rosa (`USER`) é o coração do sistema. Quase todas as outras tabelas se conectam a ela.
 *   **Função:** Armazena as informações das pessoas que utilizam o sistema.
-*   **Dados:** ID (Chave Primária), nome, email, hash da senha (para segurança), função (role) e data de criação.
+*   **Dados:** ID (Chave Primária), nome, email, hash da senha (para segurança), tipo de usuário (userType) e data de criação.
 *   **Relacionamentos:** Um usuário pode ter múltiplas transações, orçamentos, metas, contribuições e notificações.
 
 ### 2. Gestão de Gastos e Receitas
