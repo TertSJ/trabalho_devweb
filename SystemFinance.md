@@ -40,7 +40,134 @@ Criar um sistema simples, intuitivo e confiável que permita ao usuário organiz
 ### Escopo OUT (NÃO ESTARÁ INCLUIDO)
 - Integração com bancos reais.
 - IA para análise automática.
-- Chat interno.
+- Chat interno.O Diagrama Entidade–Relacionamento foi construído para representar a estrutura lógica dos dados envolvendo usuários, projetos, tarefas, comentários e roles de acesso.
+
+1. Entidade: User
+
+Representa os usuários cadastrados no sistema.
+
+Atributos principais:
+
+user_id (PK)
+
+name
+
+email
+
+password_hash
+
+role_id (FK)
+
+created_at
+
+Relacionamentos:
+
+1:N com Project (um usuário cria vários projetos)
+
+1:N com Task (um usuário pode ser responsável por várias tarefas)
+
+1:N com Comment (um usuário registra vários comentários)
+
+N:1 com Role (cada usuário pertence a um papel)
+
+2. Entidade: Role
+
+Define o tipo de permissão do usuário no sistema.
+
+Atributos principais:
+
+role_id (PK)
+
+name
+
+description
+
+Relacionamentos:
+
+1:N com User
+
+3. Entidade: Project
+
+Representa os projetos cadastrados no sistema.
+
+Atributos principais:
+
+project_id (PK)
+
+name
+
+description
+
+owner_id (FK → User)
+
+created_at
+
+Relacionamentos:
+
+N:1 com User
+
+1:N com Task
+
+4. Entidade: Task
+
+Representa as tarefas pertencentes a um projeto.
+
+Atributos principais:
+
+task_id (PK)
+
+project_id (FK → Project)
+
+assigned_to (FK → User)
+
+title
+
+description
+
+status
+
+due_date
+
+created_at
+
+Relacionamentos:
+
+N:1 com Project
+
+N:1 com User (responsável)
+
+1:N com Comment
+
+5. Entidade: Comment
+
+Representa comentários feitos em tarefas.
+
+Atributos principais:
+
+comment_id (PK)
+
+task_id (FK → Task)
+
+user_id (FK → User)
+
+content
+
+created_at
+
+Relacionamentos:
+
+N:1 com Task
+
+N:1 com User
+
+🔗 Resumo dos Relacionamentos
+Entidade A	Relacionamento	Entidade B	Tipo
+User	cria	Project	1:N
+User	é responsável por	Task	1:N
+User	registra	Comment	1:N
+Role	possui	User	1:N
+Project	possui	Task	1:N
+Task	possui	Comment	1:N
 - Sistema multiusuário empresarial.
 - Pagamentos internos.
 - Controle avançado de investimentos.
