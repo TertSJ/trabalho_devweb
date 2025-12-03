@@ -37,7 +37,7 @@ Criar um sistema simples, intuitivo e confiável que permita ao usuário organiz
 - Metas financeiras.
 - Relatórios por período.
 
-### Escopo OUT (Não Incluído na Primeira Versão)
+### Escopo OUT (NÃO ESTARÁ INCLUIDO)
 - Integração com bancos reais.
 - IA para análise automática.
 - Chat interno.
@@ -196,10 +196,6 @@ Criar um sistema simples, intuitivo e confiável que permita ao usuário organiz
 - Deve definir metas financeiras e acompanhar o progresso.
 - Deve configurar orçamentos mensais por categoria.
 - Deve visualizar relatórios completos, detalhados e exportáveis.
-
----
-
-Aqui está a continuação, **incluindo os Requisitos Funcionais, Requisitos Não Funcionais e Casos de Uso**, já formatados para você colar diretamente onde deixou o marcador **“INCLUA AQUI”**:
 
 ---
 
