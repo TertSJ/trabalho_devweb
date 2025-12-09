@@ -1,24 +1,4 @@
 <?php
-require_once 'config.php';
-require_once 'functions.php';
-
-// Processar ações
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action'])) {
-        switch ($_POST['action']) {
-            case 'adicionar':
-                adicionarTransacao($_POST);
-                break;
-            case 'excluir':
-                excluirTransacao($_POST['id']);
-                break;
-        }
-    }
-}
-
-// Buscar dados
-$transacoes = buscarTransacoes();
-$totais = calcularTotais();
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -27,26 +7,27 @@ $totais = calcularTotais();
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Controle Financeiro Pessoal</title>
   
-  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   
-  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
       <a class="navbar-brand" href="index.php">
         <i class="fas fa-wallet me-2"></i>Controle Financeiro
       </a>
+      <div>
+        <a href="logout.php" class="btn btn-outline-light">
+          <i class="fas fa-sign-out-alt me-2"></i>Sair</a>
+      </div>
     </div>
   </nav>
 
   <div class="container mt-4">
     
-    <!-- Cards de Resumo -->
+  
     <div class="row mb-4">
       <div class="col-md-4">
         <div class="card text-white bg-success">
@@ -74,7 +55,6 @@ $totais = calcularTotais();
       </div>
     </div>
 
-    <!-- Formulário de Cadastro -->
     <div class="card mb-4">
       <div class="card-header bg-primary text-white">
         <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Nova Transação</h5>
@@ -123,7 +103,6 @@ $totais = calcularTotais();
       </div>
     </div>
 
-    <!-- Lista de Transações -->
     <div class="card">
       <div class="card-header bg-secondary text-white">
         <h5 class="mb-0"><i class="fas fa-list me-2"></i>Histórico de Transações</h5>
@@ -182,7 +161,6 @@ $totais = calcularTotais();
 
   </div>
 
-  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="scripts.js"></script>
 </body>
