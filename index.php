@@ -1,4 +1,6 @@
 <?php
+include 'transacao.php';
+$nomeUsuario = $_SESSION['nome'];
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -18,6 +20,7 @@
       <a class="navbar-brand" href="index.php">
         <i class="fas fa-wallet me-2"></i>Controle Financeiro
       </a>
+      <div class="navbar-brand me-5">Bem vindo <?php echo "$nomeUsuario"?></div>
       <div>
         <a href="logout.php" class="btn btn-outline-light">
           <i class="fas fa-sign-out-alt me-2"></i>Sair</a>
@@ -27,6 +30,19 @@
 
   <div class="container mt-4">
     
+    <?php if (!empty($mensagem_sucesso)): ?>
+      <div class="alert alert-success alert-dismissible fade show">
+        <i class="fas fa-check-circle me-2"></i><?php echo $mensagem_sucesso; ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <?php endif; ?>
+    
+    <?php if (!empty($mensagem_erro)): ?>
+      <div class="alert alert-danger alert-dismissible fade show">
+        <i class="fas fa-exclamation-circle me-2"></i><?php echo $mensagem_erro; ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <?php endif; ?>
   
     <div class="row mb-4">
       <div class="col-md-4">
@@ -162,6 +178,15 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="scripts.js"></script>
+  <script>
+    // data pegando a atual
+    document.addEventListener('DOMContentLoaded', function() {
+      const dataInput = document.getElementById('data');
+      if(dataInput && !dataInput.value) {
+        const hoje = new Date().toISOString().split('T')[0];
+        dataInput.value = hoje;
+      }
+    });
+  </script>
 </body>
 </html>
