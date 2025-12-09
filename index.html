@@ -1,139 +1,177 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Controle Financeiro Pessoal</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      max-width: 600px;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 8px;
-      margin-top: 4px;
-    }
-    .error {
-      color: red;
-      font-size: 0.9em;
-      display: none;
-      margin-top: 2px;
-    }
-    .btn-submit {
-      margin-top: 15px;
-      padding: 10px 15px;
-      background-color: #0275d8;
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
-    .btn-submit:hover {
-      background-color: #025aa5;
-    }
-  </style>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <i class="fas fa-wallet me-2"></i>Controle Financeiro
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="#"><i class="fas fa-home me-1"></i>Início</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#"><i class="fas fa-chart-line me-1"></i>Relatórios</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
-  <h1>Controle Financeiro Pessoal</h1>
+  <div class="container mt-4">
+    
+    <!-- Cards de Resumo -->
+    <div class="row mb-4">
+      <div class="col-md-4 mb-3">
+        <div class="card text-white bg-info">
+          <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-balance-scale me-2"></i>Saldo</h5>
+            <h3 class="card-text" id="saldo">R$ 0,00</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="card text-white bg-success">
+          <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-arrow-up me-2"></i>Receitas</h5>
+            <h3 class="card-text" id="total-receitas">R$ 0,00</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="card text-white bg-danger">
+          <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-arrow-down me-2"></i>Despesas</h5>
+            <h3 class="card-text" id="total-despesas">R$ 0,00</h3>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <form id="finance-form" novalidate>
-    <label for="tipo">Tipo:</label>
-    <select id="tipo" name="tipo" required>
-      <option value="">Selecione</option>
-      <option value="receita">Receita</option>
-      <option value="despesa">Despesa</option>
-    </select>
-    <span class="error" id="tipo-error">Por favor, selecione o tipo.</span>
+    <!-- Formulário de Nova Transação -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Nova Transação</h5>
+          </div>
+          <div class="card-body">
+            <form id="form-transacao">
+              <div class="row">
+                <div class="col-md-3 mb-3">
+                  <label for="tipo" class="form-label">Tipo</label>
+                  <select class="form-select" id="tipo" required>
+                    <option value="">Selecione...</option>
+                    <option value="receita">Receita</option>
+                    <option value="despesa">Despesa</option>
+                  </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                  <label for="descricao" class="form-label">Descrição</label>
+                  <input type="text" class="form-control" id="descricao" placeholder="Ex: Salário" required>
+                </div>
+                <div class="col-md-2 mb-3">
+                  <label for="valor" class="form-label">Valor</label>
+                  <input type="number" class="form-control" id="valor" placeholder="0.00" step="0.01" required>
+                </div>
+                <div class="col-md-2 mb-3">
+                  <label for="data" class="form-label">Data</label>
+                  <input type="date" class="form-control" id="data" required>
+                </div>
+                <div class="col-md-2 mb-3">
+                  <label class="form-label d-block">&nbsp;</label>
+                  <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-save me-1"></i>Adicionar
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <label for="valor">Valor (R$):</label>
-    <input type="number" id="valor" name="valor" step="0.01" min="0.01" placeholder="Ex: 150.00" required />
-    <span class="error" id="valor-error">Informe um valor maior que zero.</span>
+    <!-- Filtros -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <h4><i class="fas fa-list me-2"></i>Transações</h4>
+      </div>
+      <div class="col-md-6">
+        <div class="input-group">
+          <span class="input-group-text"><i class="fas fa-search"></i></span>
+          <input type="text" class="form-control" id="filtro-busca" placeholder="Buscar transação...">
+          <select class="form-select" id="filtro-tipo" style="max-width: 150px;">
+            <option value="">Todos</option>
+            <option value="receita">Receitas</option>
+            <option value="despesa">Despesas</option>
+          </select>
+        </div>
+      </div>
+    </div>
 
-    <label for="data">Data:</label>
-    <input type="date" id="data" name="data" required />
-    <span class="error" id="data-error">Informe uma data válida.</span>
+    <!-- Tabela de Transações -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead class="table-light">
+                  <tr>
+                    <th>Data</th>
+                    <th>Descrição</th>
+                    <th>Tipo</th>
+                    <th>Valor</th>
+                    <th class="text-center">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="lista-transacoes">
+                  <tr>
+                    <td colspan="5" class="text-center text-muted">
+                      <i class="fas fa-inbox fa-2x mb-2"></i>
+                      <p>Nenhuma transação cadastrada</p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <label for="categoria">Categoria:</label>
-    <input type="text" id="categoria" name="categoria" placeholder="Ex: Alimentação" required />
-    <span class="error" id="categoria-error">Categoria é obrigatória.</span>
+  </div>
 
-    <label for="descricao">Descrição:</label>
-    <textarea id="descricao" name="descricao" rows="3" placeholder="Descrição opcional"></textarea>
+  <!-- Footer -->
+  <footer class="bg-light text-center py-3 mt-5">
+    <div class="container">
+      <p class="text-muted mb-0">
+        <i class="fas fa-wallet me-1"></i>Sistema de Controle Financeiro &copy; 2025
+      </p>
+    </div>
+  </footer>
 
-    <button type="submit" class="btn-submit">Adicionar</button>
-  </form>
-
-  <script>
-    document.getElementById('finance-form').addEventListener('submit', function(event) {
-      event.preventDefault();
-
-      let formIsValid = true;
-
-      // tipo
-      const tipo = document.getElementById('tipo');
-      const tipoError = document.getElementById('tipo-error');
-      if (tipo.value === '') {
-        tipoError.style.display = 'block';
-        formIsValid = false;
-      } else {
-        tipoError.style.display = 'none';
-      }
-
-      // valor
-      const valor = document.getElementById('valor');
-      const valorError = document.getElementById('valor-error');
-      if (valor.value === '' || parseFloat(valor.value) <= 0) {
-        valorError.style.display = 'block';
-        formIsValid = false;
-      } else {
-        valorError.style.display = 'none';
-      }
-
-      // data
-      const data = document.getElementById('data');
-      const dataError = document.getElementById('data-error');
-      if (data.value === '') {
-        dataError.style.display = 'block';
-        formIsValid = false;
-      } else {
-        dataError.style.display = 'none';
-      }
-
-      // categoria
-      const categoria = document.getElementById('categoria');
-      const categoriaError = document.getElementById('categoria-error');
-      if (categoria.value.trim() === '') {
-        categoriaError.style.display = 'block';
-        formIsValid = false;
-      } else {
-        categoriaError.style.display = 'none';
-      }
-
-      // Se tudo estiver válido, por enquanto apenas exibir os dados no console
-      if (formIsValid) {
-        const dados = {
-          tipo: tipo.value,
-          valor: parseFloat(valor.value).toFixed(2),
-          data: data.value,
-          categoria: categoria.value.trim(),
-          descricao: document.getElementById('descricao').value.trim()
-        };
-        console.log('Dados a cadastrar:', dados);
-        alert('Dados validados com sucesso! Agora você pode enviar ao servidor.');
-
-        // Aqui você pode adicionar código para enviar os dados ao back-end via fetch/AJAX
-
-        // Resetar formulário após envio
-        this.reset();
-      }
-    });
-  </script>
-
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom JS -->
+  <script src="scripts.js"></script>
 </body>
 </html>
