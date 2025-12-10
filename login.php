@@ -6,23 +6,29 @@
         $password = $conexao->real_escape_string($_POST['password']);
 
         $sql_code = "SELECT * FROM usuarios WHERE email = '$email' AND senha = '$password'";
+        $sql_pass = "SELECT senha FROM usuarios WHERE email = '$email'";
         $sql_query = $conexao->query($sql_code) or die("Falha na execução do código SQL: " . $conexao->error);
-        $quantidade = $sql_query->num_rows;
+        $sql_pass_query = $conexao->query($sql_pass) or die("Falha na execução do código SQL: " . $conexao->error);
+        $pass_bd = $sql_pass_query->fetch_assoc()['senha'];
 
-        if($quantidade == 1 ){
-
-            $usuario = $sql_query->fetch_assoc();
-
-                if(!isset($_SESSION)){
-                session_start();
-            }
-            
-            $_SESSION['id'] = $usuario['id'];
-            $_SESSION['nome'] = $usuario['nome'];
-            header("Location: index.php");
-        
-        }else{
+        if(strcmp($password, $pass_bd) < 0){
             $erro_login = "Falha ao logar! E-mail ou senha incorretos.";
+    
+        }else{
+            $quantidade = $sql_query->num_rows;
+            if($quantidade == 1 ){
+
+                $usuario = $sql_query->fetch_assoc();
+
+                    if(!isset($_SESSION)){
+                    session_start();
+                }
+                
+                $_SESSION['id'] = $usuario['id'];
+                $_SESSION['nome'] = $usuario['nome'];
+                header("Location: index.php");
+            }
+        
         }
     }
 ?>

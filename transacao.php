@@ -64,6 +64,8 @@ if ($result_transacoes) {
 }
 
 // Calcular totais
+$hoje = date('Y-m-d');
+echo "Hoje é $hoje";
 $sql_totais = "SELECT 
                 SUM(CASE WHEN tipo = 'receita' THEN valor ELSE 0 END) as receitas,
                 SUM(CASE WHEN tipo = 'despesa' THEN valor ELSE 0 END) as despesas
