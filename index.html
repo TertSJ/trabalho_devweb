@@ -95,7 +95,7 @@
 
   <!-- Campo para armazenar o salário mensal -->
   <label for="salario-mensal">Salário mensal (R$):</label>
-  <input type="number" id="salario-mensal" step="0.01" min="0" placeholder="Salario: 2500.00" />
+  <input type="number" id="salario-mensal" step="0.01" min="0" placeholder="Salário: 2500.00" />
   <small>Este valor será considerado no resumo como referência de renda.</small>
 
   <form id="finance-form" novalidate>
@@ -103,9 +103,22 @@
     <select id="tipo" name="tipo" required>
       <option value="">Selecione</option>
       <option value="receita">Receita</option>
-      <option value="despesa">Despesa</option>
+
+      <!-- Novos tipos de despesas -->
+      <option value="despesa_fixa_essencial">Despesa Fixa Essencial</option>
+      <option value="despesa_variavel_essencial">Despesa Variável Essencial</option>
+      <option value="despesa_nao_essencial">Despesa Não Essencial (Lazer)</option>
+      <option value="investimento_divida">Investimentos e Dívidas</option>
     </select>
     <span class="error" id="tipo-error">Por favor, selecione o tipo.</span>
+
+    <small>
+      Exemplos:<br>
+      • Despesa Fixa Essencial: Moradia, serviços públicos, convênio, escola, empréstimos.<br>
+      • Despesa Variável Essencial: Alimentação, combustível, remédios, higiene, vestuário.<br>
+      • Despesa Não Essencial: restaurantes, viagens, streaming, presentes.<br>
+      • Investimentos e Dívidas: poupança, investimentos, cartão de crédito, amortização.
+    </small>
 
     <label for="valor">Valor (R$):</label>
     <input type="number" id="valor" name="valor" step="0.01" min="0.01" placeholder="Ex: 150.00" required />
@@ -116,7 +129,7 @@
     <span class="error" id="data-error">Informe uma data válida.</span>
 
     <label for="categoria">Categoria:</label>
-    <input type="text" id="categoria" name="categoria" placeholder="Ex: Alimentação" required />
+    <input type="text" id="categoria" name="categoria" placeholder="Ex: Aluguel, Luz, Supermercado, Netflix" required />
     <span class="error" id="categoria-error">Categoria é obrigatória.</span>
 
     <label for="descricao">Descrição:</label>
@@ -211,7 +224,9 @@
       const lista = document.getElementById('transacoes');
 
       const li = document.createElement('li');
-      li.classList.add(dados.tipo);
+
+      // Visual: receita em verde, todo o resto tratado como despesa
+      li.classList.add(dados.tipo === 'receita' ? 'receita' : 'despesa');
 
       const textoLeft = document.createElement('span');
       textoLeft.textContent = `${dados.data} - ${dados.categoria}${dados.descricao ? ' - ' + dados.descricao : ''}`;
