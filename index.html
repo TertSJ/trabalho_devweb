@@ -36,7 +36,6 @@
       background-color: #fff9c4;
     }
 
-    /* Barra superior tipo app */
     .app-header {
       position: sticky;
       top: 0;
@@ -62,7 +61,7 @@
     .app-main {
       flex: 1;
       padding: 16px;
-      padding-bottom: 70px; /* espaço para a barra inferior */
+      padding-bottom: 70px;
     }
 
     label {
@@ -107,7 +106,8 @@
       margin-top: 25px;
     }
 
-    #lista-transacoes h2 {
+    #lista-transacoes h2,
+    #lista-transacoes h3 {
       margin-top: 20px;
       margin-bottom: 8px;
     }
@@ -118,7 +118,8 @@
       margin: 0;
     }
 
-    #lista-transacoes li {
+    #lista-transacoes li,
+    #lista-poupanca li {
       background: #fffde7;
       border: 1px solid #f0e68c;
       border-radius: 4px;
@@ -126,7 +127,9 @@
       margin-top: 6px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
       font-size: 0.95em;
+      gap: 8px;
     }
 
     #lista-transacoes li.receita {
@@ -137,11 +140,46 @@
       border-left: 4px solid var(--vermelho);
     }
 
-    #lista-transacoes li.poupanca {
+    #lista-transacoes li.poupanca,
+    #lista-poupanca li {
       border-left: 4px solid var(--azul);
     }
 
-    /* Resumos lado a lado */
+    .transacao-info {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .transacao-valor {
+      font-weight: bold;
+      min-width: 90px;
+      text-align: right;
+    }
+
+    .transacao-acoes {
+      display: flex;
+      gap: 4px;
+    }
+
+    .btn-acao {
+      border: none;
+      padding: 4px 6px;
+      font-size: 0.8em;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-editar {
+      background-color: #e0f2f1;
+      color: #00695c;
+    }
+
+    .btn-excluir {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+
     .resumos-container {
       display: flex;
       gap: 16px;
@@ -167,7 +205,6 @@
       margin: 4px 0;
     }
 
-    /* Telas (abas) */
     .screen {
       display: none;
     }
@@ -176,7 +213,6 @@
       display: block;
     }
 
-    /* Barra inferior tipo navegação de app */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -215,6 +251,19 @@
       font-weight: bold;
     }
 
+    .status-ok {
+      color: var(--verde);
+      font-weight: bold;
+    }
+    .status-atencao {
+      color: #ff9800;
+      font-weight: bold;
+    }
+    .status-critico {
+      color: var(--vermelho);
+      font-weight: bold;
+    }
+
     @media (max-width: 600px) {
       .app-main {
         padding: 12px;
@@ -225,7 +274,6 @@
 </head>
 <body>
   <div class="app-container">
-    <!-- Cabeçalho tipo app -->
     <header class="app-header">
       <span class="icon">💳</span>
       <h1>Carteira de Controle Financeiro</h1>
@@ -236,24 +284,21 @@
       <section id="screen-lancar" class="screen active">
         <h2>Lançar transação</h2>
 
-        <!-- Campo para armazenar o salário mensal -->
         <label for="salario-mensal">Salário mensal (R$):</label>
         <input type="number" id="salario-mensal" step="0.01" min="0" placeholder="Salário: 2500.00" />
         <small>Este valor será considerado no resumo como referência de renda.</small>
 
         <form id="finance-form" novalidate>
+          <input type="hidden" id="indice-edicao" value="-1" />
+
           <label for="tipo">Tipo:</label>
           <select id="tipo" name="tipo" required>
             <option value="">Selecione</option>
             <option value="receita">Receita</option>
-
-            <!-- Tipos de despesas -->
             <option value="despesa_fixa_essencial">Despesa Fixa Essencial</option>
             <option value="despesa_variavel_essencial">Despesa Variável Essencial</option>
             <option value="despesa_nao_essencial">Despesa Não Essencial (Lazer)</option>
             <option value="investimento_divida">Investimentos e Dívidas</option>
-
-            <!-- Novo tipo: Poupança -->
             <option value="poupanca">Poupança</option>
           </select>
           <span class="error" id="tipo-error">Por favor, selecione o tipo.</span>
@@ -282,11 +327,11 @@
           <label for="descricao">Descrição:</label>
           <textarea id="descricao" name="descricao" rows="3" placeholder="Descrição opcional"></textarea>
 
-          <button type="submit" class="btn-submit">Adicionar à Carteira</button>
+          <button type="submit" class="btn-submit">Salvar transação</button>
         </form>
       </section>
 
-      <!-- TELA 2: CARTEIRA (lista + resumos) -->
+      <!-- TELA 2: CARTEIRA -->
       <section id="screen-carteira" class="screen">
         <h2>Carteira</h2>
 
@@ -295,7 +340,6 @@
           <ul id="transacoes"></ul>
         </section>
 
-        <!-- Resumos lado a lado -->
         <div class="resumos-container">
           <section class="resumo-box" id="resumo-principal">
             <h2>Resumo</h2>
@@ -309,6 +353,8 @@
             <p><strong>Salário mensal informado:</strong> <span id="salario-informado">R$ 0,00</span></p>
             <p><strong>Total Gasto:</strong> <span id="total-gasto">R$ 0,00</span></p>
             <p><strong>Sobra do Salário:</strong> <span id="sobra-salario">R$ 0,00</span></p>
+            <p><strong>Percentual gasto do salário:</strong> <span id="percentual-gasto">0%</span></p>
+            <p><strong>Situação:</strong> <span id="situacao-gasto" class="status-ok">OK</span></p>
           </section>
         </div>
       </section>
@@ -316,15 +362,20 @@
       <!-- TELA 3: POUPANÇA -->
       <section id="screen-poupanca" class="screen">
         <h2>Poupança</h2>
+
         <section class="resumo-box" id="resumo-poupanca">
           <h2>Resumo de Poupança</h2>
           <p><strong>Valor adicionado (última operação):</strong> <span id="valor-adicionado-poupanca">R$ 0,00</span></p>
           <p><strong>Total de poupança:</strong> <span id="total-poupanca">R$ 0,00</span></p>
         </section>
+
+        <section id="lista-poupanca">
+          <h3>Lançamentos de Poupança</h3>
+          <ul id="poupanca-lancamentos"></ul>
+        </section>
       </section>
     </main>
 
-    <!-- Barra inferior de navegação -->
     <nav class="bottom-nav">
       <button data-target="screen-lancar" class="active">
         <span class="icon">➕</span>
@@ -346,25 +397,20 @@
     let totalPoupanca = 0;
     let ultimoValorPoupanca = 0;
     let transacoes = [];
+    let indiceEdicao = -1;
 
-    // -------- Navegação entre telas --------
     const navButtons = document.querySelectorAll('.bottom-nav button');
     const screens = document.querySelectorAll('.screen');
 
     navButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         const target = btn.getAttribute('data-target');
-
-        screens.forEach(sc => {
-          sc.classList.toggle('active', sc.id === target);
-        });
-
+        screens.forEach(sc => sc.classList.toggle('active', sc.id === target));
         navButtons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
       });
     });
 
-    // --------- Salário mensal ---------
     document.getElementById('salario-mensal').addEventListener('change', function () {
       const v = parseFloat(this.value);
       salarioMensal = isNaN(v) || v < 0 ? 0 : v;
@@ -373,7 +419,6 @@
       atualizarResumo();
     });
 
-    // --------- Formulário ---------
     document.getElementById('finance-form').addEventListener('submit', function(event) {
       event.preventDefault();
 
@@ -415,59 +460,170 @@
         categoriaError.style.display = 'none';
       }
 
-      if (formIsValid) {
-        const valorNumero = parseFloat(valor.value);
+      if (!formIsValid) return;
 
-        const dados = {
-          tipo: tipo.value,
-          valor: valorNumero,
-          data: data.value,
-          categoria: categoria.value.trim(),
-          descricao: document.getElementById('descricao').value.trim()
-        };
+      const valorNumero = parseFloat(valor.value);
 
-        // Atualiza controle de poupança se o tipo for poupança
-        if (dados.tipo === 'poupanca') {
-          ultimoValorPoupanca = valorNumero;
-          totalPoupanca += valorNumero;
-          document.getElementById('valor-adicionado-poupanca').textContent = `R$ ${ultimoValorPoupanca.toFixed(2)}`;
-          document.getElementById('total-poupanca').textContent = `R$ ${totalPoupanca.toFixed(2)}`;
-        }
+      const dados = {
+        tipo: tipo.value,
+        valor: valorNumero,
+        data: data.value,
+        categoria: categoria.value.trim(),
+        descricao: document.getElementById('descricao').value.trim()
+      };
 
-        transacoes.push(dados);
-        adicionarTransacaoNaCarteira(dados);
-        salvarEstado();
-        atualizarResumo();
+      // Ajuste de total de poupança
+      if (dados.tipo === 'poupanca') {
+        const valorAntigo = indiceEdicao >= 0 && transacoes[indiceEdicao].tipo === 'poupanca'
+          ? transacoes[indiceEdicao].valor
+          : 0;
 
-        alert('Dados validados com sucesso e adicionados à carteira.');
-
-        this.reset();
+        totalPoupanca = totalPoupanca - valorAntigo + valorNumero;
+        ultimoValorPoupanca = valorNumero;
+        document.getElementById('valor-adicionado-poupanca').textContent = `R$ ${ultimoValorPoupanca.toFixed(2)}`;
+        document.getElementById('total-poupanca').textContent = `R$ ${totalPoupanca.toFixed(2)}`;
+      } else if (indiceEdicao >= 0 && transacoes[indiceEdicao].tipo === 'poupanca') {
+        totalPoupanca -= transacoes[indiceEdicao].valor;
+        if (totalPoupanca < 0) totalPoupanca = 0;
+        document.getElementById('total-poupanca').textContent = `R$ ${totalPoupanca.toFixed(2)}`;
       }
+
+      if (indiceEdicao === -1) {
+        transacoes.push(dados);
+      } else {
+        transacoes[indiceEdicao] = dados;
+      }
+
+      renderizarTransacoes();
+      renderizarPoupancaLancamentos();
+      salvarEstado();
+      atualizarResumo();
+
+      alert(indiceEdicao === -1 ? 'Transação adicionada com sucesso.' : 'Transação atualizada com sucesso.');
+
+      this.reset();
+      indiceEdicao = -1;
+      document.getElementById('indice-edicao').value = -1;
     });
 
-    function adicionarTransacaoNaCarteira(dados) {
+    function renderizarTransacoes() {
       const lista = document.getElementById('transacoes');
-      const li = document.createElement('li');
+      lista.innerHTML = '';
 
-      // Visual: receita em verde, poupança em azul, resto como despesa
-      if (dados.tipo === 'receita') {
-        li.classList.add('receita');
-      } else if (dados.tipo === 'poupanca') {
-        li.classList.add('poupanca');
-      } else {
-        li.classList.add('despesa');
+      transacoes.forEach((dados, indice) => {
+        const li = document.createElement('li');
+
+        if (dados.tipo === 'receita') {
+          li.classList.add('receita');
+        } else if (dados.tipo === 'poupanca') {
+          li.classList.add('poupanca');
+        } else {
+          li.classList.add('despesa');
+        }
+
+        const info = document.createElement('div');
+        info.className = 'transacao-info';
+        info.textContent = `${dados.data} - ${dados.categoria}${dados.descricao ? ' - ' + dados.descricao : ''}`;
+
+        const valorSpan = document.createElement('span');
+        valorSpan.className = 'transacao-valor';
+        valorSpan.textContent = `R$ ${dados.valor.toFixed(2)}`;
+
+        const acoes = document.createElement('div');
+        acoes.className = 'transacao-acoes';
+
+        const btnEditar = document.createElement('button');
+        btnEditar.textContent = 'Editar';
+        btnEditar.className = 'btn-acao btn-editar';
+        btnEditar.addEventListener('click', () => editarTransacao(indice));
+
+        const btnExcluir = document.createElement('button');
+        btnExcluir.textContent = 'Excluir';
+        btnExcluir.className = 'btn-acao btn-excluir';
+        btnExcluir.addEventListener('click', () => excluirTransacao(indice));
+
+        acoes.appendChild(btnEditar);
+        acoes.appendChild(btnExcluir);
+
+        li.appendChild(info);
+        li.appendChild(valorSpan);
+        li.appendChild(acoes);
+
+        lista.appendChild(li);
+      });
+    }
+
+    function renderizarPoupancaLancamentos() {
+      const lista = document.getElementById('poupanca-lancamentos');
+      lista.innerHTML = '';
+
+      transacoes.forEach((dados, indice) => {
+        if (dados.tipo !== 'poupanca') return;
+
+        const li = document.createElement('li');
+
+        const info = document.createElement('div');
+        info.className = 'transacao-info';
+        info.textContent = `${dados.data} - ${dados.categoria}${dados.descricao ? ' - ' + dados.descricao : ''}`;
+
+        const valorSpan = document.createElement('span');
+        valorSpan.className = 'transacao-valor';
+        valorSpan.textContent = `R$ ${dados.valor.toFixed(2)}`;
+
+        const acoes = document.createElement('div');
+        acoes.className = 'transacao-acoes';
+
+        const btnEditar = document.createElement('button');
+        btnEditar.textContent = 'Editar';
+        btnEditar.className = 'btn-acao btn-editar';
+        btnEditar.addEventListener('click', () => editarTransacao(indice));
+
+        const btnExcluir = document.createElement('button');
+        btnExcluir.textContent = 'Excluir';
+        btnExcluir.className = 'btn-acao btn-excluir';
+        btnExcluir.addEventListener('click', () => excluirTransacao(indice));
+
+        acoes.appendChild(btnEditar);
+        acoes.appendChild(btnExcluir);
+
+        li.appendChild(info);
+        li.appendChild(valorSpan);
+        li.appendChild(acoes);
+
+        lista.appendChild(li);
+      });
+    }
+
+    function editarTransacao(indice) {
+      const t = transacoes[indice];
+      indiceEdicao = indice;
+      document.getElementById('indice-edicao').value = indice;
+
+      document.getElementById('tipo').value = t.tipo;
+      document.getElementById('valor').value = t.valor;
+      document.getElementById('data').value = t.data;
+      document.getElementById('categoria').value = t.categoria;
+      document.getElementById('descricao').value = t.descricao;
+
+      screens.forEach(sc => sc.classList.toggle('active', sc.id === 'screen-lancar'));
+      navButtons.forEach(b => b.classList.remove('active'));
+      document.querySelector('button[data-target="screen-lancar"]').classList.add('active');
+    }
+
+    function excluirTransacao(indice) {
+      const t = transacoes[indice];
+
+      if (t.tipo === 'poupanca') {
+        totalPoupanca -= t.valor;
+        if (totalPoupanca < 0) totalPoupanca = 0;
+        document.getElementById('total-poupanca').textContent = `R$ ${totalPoupanca.toFixed(2)}`;
       }
 
-      const textoLeft = document.createElement('span');
-      textoLeft.textContent = `${dados.data} - ${dados.categoria}${dados.descricao ? ' - ' + dados.descricao : ''}`;
-
-      const textoRight = document.createElement('span');
-      textoRight.textContent = `R$ ${dados.valor.toFixed(2)}`;
-
-      li.appendChild(textoLeft);
-      li.appendChild(textoRight);
-
-      lista.appendChild(li);
+      transacoes.splice(indice, 1);
+      renderizarTransacoes();
+      renderizarPoupancaLancamentos();
+      salvarEstado();
+      atualizarResumo();
     }
 
     function atualizarResumo() {
@@ -476,7 +632,7 @@
       let totalDespesas = 0;
 
       itens.forEach(li => {
-        const valorTexto = li.querySelector('span:last-child').textContent.replace('R$','').trim();
+        const valorTexto = li.querySelector('.transacao-valor').textContent.replace('R$','').trim();
         const valor = parseFloat(valorTexto.replace(',', '.')) || 0;
 
         if (li.classList.contains('receita')) {
@@ -484,24 +640,45 @@
         } else if (li.classList.contains('despesa')) {
           totalDespesas += valor;
         }
-        // Poupança não entra em receitas nem em despesas aqui
       });
 
       const saldo = totalReceitas - totalDespesas;
       const totalGasto = totalDespesas;
       const sobraSalario = salarioMensal - totalGasto;
 
-      // Resumo principal
       document.getElementById('total-receitas').textContent = `R$ ${totalReceitas.toFixed(2)}`;
       document.getElementById('total-despesas').textContent = `R$ ${totalDespesas.toFixed(2)}`;
       document.getElementById('saldo').textContent = `R$ ${saldo.toFixed(2)}`;
 
-      // Resumo de gasto
       document.getElementById('total-gasto').textContent = `R$ ${totalGasto.toFixed(2)}`;
       document.getElementById('sobra-salario').textContent = `R$ ${sobraSalario.toFixed(2)}`;
+
+      let percentual = 0;
+      if (salarioMensal > 0) {
+        percentual = (totalGasto / salarioMensal) * 100;
+      }
+      const percentualEl = document.getElementById('percentual-gasto');
+      const situacaoEl = document.getElementById('situacao-gasto');
+
+      percentualEl.textContent = `${percentual.toFixed(1)}%`;
+
+      situacaoEl.classList.remove('status-ok', 'status-atencao', 'status-critico');
+
+      if (salarioMensal <= 0) {
+        situacaoEl.textContent = 'Informe o salário';
+        situacaoEl.classList.add('status-critico');
+      } else if (percentual <= 50) {
+        situacaoEl.textContent = 'OK';
+        situacaoEl.classList.add('status-ok');
+      } else if (percentual <= 80) {
+        situacaoEl.textContent = 'Atenção';
+        situacaoEl.classList.add('status-atencao');
+      } else {
+        situacaoEl.textContent = 'Crítico';
+        situacaoEl.classList.add('status-critico');
+      }
     }
 
-    // --------- Persistência no localStorage ---------
     function salvarEstado() {
       const estado = {
         salarioMensal,
@@ -523,24 +700,19 @@
         ultimoValorPoupanca = estado.ultimoValorPoupanca || 0;
         transacoes = Array.isArray(estado.transacoes) ? estado.transacoes : [];
 
-        // Atualiza campos visuais
         document.getElementById('salario-mensal').value = salarioMensal || '';
         document.getElementById('salario-informado').textContent = `R$ ${salarioMensal.toFixed(2)}`;
         document.getElementById('valor-adicionado-poupanca').textContent = `R$ ${ultimoValorPoupanca.toFixed(2)}`;
         document.getElementById('total-poupanca').textContent = `R$ ${totalPoupanca.toFixed(2)}`;
 
-        // Recria lista de transações
-        const lista = document.getElementById('transacoes');
-        lista.innerHTML = '';
-        transacoes.forEach(t => adicionarTransacaoNaCarteira(t));
-
+        renderizarTransacoes();
+        renderizarPoupancaLancamentos();
         atualizarResumo();
       } catch (e) {
         console.error('Erro ao carregar estado da carteira:', e);
       }
     }
 
-    // Carrega estado ao abrir a página
     carregarEstado();
   </script>
 </body>
