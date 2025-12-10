@@ -16,9 +16,10 @@
                 if(!isset($_SESSION)){
                 session_start();
             }
-            header("Location: index.php");
+            
             $_SESSION['id'] = $usuario['id'];
             $_SESSION['nome'] = $usuario['nome'];
+            header("Location: index.php");
         
         }else{
             $erro_login = "Falha ao logar! E-mail ou senha incorretos.";

@@ -20,7 +20,7 @@ $nomeUsuario = $_SESSION['nome'];
       <a class="navbar-brand" href="index.php">
         <i class="fas fa-wallet me-2"></i>Controle Financeiro
       </a>
-      <div class="navbar-brand me-5">Bem vindo <?php echo "$nomeUsuario"?></div>
+      <div class="navbar-brand me-5">Bem vindo <?php echo "$nomeUsuario";?></div>
       <div>
         <a href="logout.php" class="btn btn-outline-light">
           <i class="fas fa-sign-out-alt me-2"></i>Sair</a>
