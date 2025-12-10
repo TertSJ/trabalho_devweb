@@ -3,62 +3,121 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Controle Financeiro Pessoal</title>
+  <title>Carteira de Controle Financeiro</title>
   <style>
+    :root {
+      --amarelo-fundo: #fff9c4;
+      --amarelo-principal: #fbc02d;
+      --amarelo-escuro: #f9a825;
+      --cinza-escuro: #333;
+      --verde: #2e7d32;
+      --vermelho: #c62828;
+      --azul: #1565c0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
-      max-width: 900px;
-      background-color: #fff9c4; /* amarelo bem claro */
+      margin: 0;
+      background-color: var(--amarelo-fundo);
+      display: flex;
+      justify-content: center;
     }
-    h1 {
+
+    .app-container {
+      width: 100%;
+      max-width: 900px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: #fff9c4;
+    }
+
+    /* Barra superior tipo app */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: linear-gradient(90deg, #fbc02d, #f9a825);
+      color: var(--cinza-escuro);
+      padding: 12px 16px;
       display: flex;
       align-items: center;
       gap: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    h1::before {
-      content: "💳"; /* ícone de carteira/cartão */
+
+    .app-header span.icon {
       font-size: 1.4em;
     }
+
+    .app-header h1 {
+      font-size: 1.1em;
+      margin: 0;
+    }
+
+    .app-main {
+      flex: 1;
+      padding: 16px;
+      padding-bottom: 70px; /* espaço para a barra inferior */
+    }
+
     label {
       display: block;
       margin-top: 10px;
     }
+
     input, select, textarea {
       width: 100%;
       padding: 8px;
       margin-top: 4px;
     }
+
+    small {
+      font-size: 0.85em;
+    }
+
     .error {
       color: red;
       font-size: 0.9em;
       display: none;
       margin-top: 2px;
     }
+
     .btn-submit {
       margin-top: 15px;
       padding: 10px 15px;
-      background-color: #fbc02d; /* amarelo mais forte */
+      background-color: var(--amarelo-principal);
       border: none;
-      color: #333;
+      color: var(--cinza-escuro);
       cursor: pointer;
       font-weight: bold;
+      border-radius: 4px;
+      width: 100%;
     }
+
     .btn-submit:hover {
-      background-color: #f9a825;
+      background-color: var(--amarelo-escuro);
     }
+
     #lista-transacoes {
       margin-top: 25px;
     }
+
     #lista-transacoes h2 {
       margin-top: 20px;
       margin-bottom: 8px;
     }
+
     #lista-transacoes ul {
       list-style: none;
       padding: 0;
       margin: 0;
     }
+
     #lista-transacoes li {
       background: #fffde7;
       border: 1px solid #f0e68c;
@@ -69,23 +128,27 @@
       justify-content: space-between;
       font-size: 0.95em;
     }
+
     #lista-transacoes li.receita {
-      border-left: 4px solid green;
-    }
-    #lista-transacoes li.despesa {
-      border-left: 4px solid red;
-    }
-    #lista-transacoes li.poupanca {
-      border-left: 4px solid blue;
+      border-left: 4px solid var(--verde);
     }
 
-    /* Container para colocar os resumos lado a lado */
+    #lista-transacoes li.despesa {
+      border-left: 4px solid var(--vermelho);
+    }
+
+    #lista-transacoes li.poupanca {
+      border-left: 4px solid var(--azul);
+    }
+
+    /* Resumos lado a lado */
     .resumos-container {
       display: flex;
       gap: 16px;
       margin-top: 20px;
       flex-wrap: wrap;
     }
+
     .resumo-box {
       flex: 1 1 250px;
       padding: 10px;
@@ -94,109 +157,223 @@
       border: 1px solid #f0e68c;
       font-size: 0.95em;
     }
+
     .resumo-box h2 {
       margin-top: 0;
       margin-bottom: 8px;
     }
+
     .resumo-box p {
       margin: 4px 0;
+    }
+
+    /* Telas (abas) */
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    /* Barra inferior tipo navegação de app */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      max-width: 900px;
+      width: 100%;
+      background: #fffde7;
+      border-top: 1px solid #f0e68c;
+      display: flex;
+      justify-content: space-around;
+      padding: 6px 0;
+      box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+    }
+
+    .bottom-nav button {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 6px 0;
+      font-size: 0.85em;
+      color: #666;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      cursor: pointer;
+    }
+
+    .bottom-nav button span.icon {
+      font-size: 1.1em;
+    }
+
+    .bottom-nav button.active {
+      color: var(--cinza-escuro);
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      .app-main {
+        padding: 12px;
+        padding-bottom: 70px;
+      }
     }
   </style>
 </head>
 <body>
+  <div class="app-container">
+    <!-- Cabeçalho tipo app -->
+    <header class="app-header">
+      <span class="icon">💳</span>
+      <h1>Carteira de Controle Financeiro</h1>
+    </header>
 
-  <h1>Carteira de Controle Financeiro</h1>
+    <main class="app-main">
+      <!-- TELA 1: LANÇAR -->
+      <section id="screen-lancar" class="screen active">
+        <h2>Lançar transação</h2>
 
-  <!-- Campo para armazenar o salário mensal -->
-  <label for="salario-mensal">Salário mensal (R$):</label>
-  <input type="number" id="salario-mensal" step="0.01" min="0" placeholder="Salário: 2500.00" />
-  <small>Este valor será considerado no resumo como referência de renda.</small>
+        <!-- Campo para armazenar o salário mensal -->
+        <label for="salario-mensal">Salário mensal (R$):</label>
+        <input type="number" id="salario-mensal" step="0.01" min="0" placeholder="Salário: 2500.00" />
+        <small>Este valor será considerado no resumo como referência de renda.</small>
 
-  <form id="finance-form" novalidate>
-    <label for="tipo">Tipo:</label>
-    <select id="tipo" name="tipo" required>
-      <option value="">Selecione</option>
-      <option value="receita">Receita</option>
+        <form id="finance-form" novalidate>
+          <label for="tipo">Tipo:</label>
+          <select id="tipo" name="tipo" required>
+            <option value="">Selecione</option>
+            <option value="receita">Receita</option>
 
-      <!-- Tipos de despesas -->
-      <option value="despesa_fixa_essencial">Despesa Fixa Essencial</option>
-      <option value="despesa_variavel_essencial">Despesa Variável Essencial</option>
-      <option value="despesa_nao_essencial">Despesa Não Essencial (Lazer)</option>
-      <option value="investimento_divida">Investimentos e Dívidas</option>
+            <!-- Tipos de despesas -->
+            <option value="despesa_fixa_essencial">Despesa Fixa Essencial</option>
+            <option value="despesa_variavel_essencial">Despesa Variável Essencial</option>
+            <option value="despesa_nao_essencial">Despesa Não Essencial (Lazer)</option>
+            <option value="investimento_divida">Investimentos e Dívidas</option>
 
-      <!-- Novo tipo: Poupança -->
-      <option value="poupanca">Poupança</option>
-    </select>
-    <span class="error" id="tipo-error">Por favor, selecione o tipo.</span>
+            <!-- Novo tipo: Poupança -->
+            <option value="poupanca">Poupança</option>
+          </select>
+          <span class="error" id="tipo-error">Por favor, selecione o tipo.</span>
 
-    <small>
-      Exemplos:<br>
-      • Despesa Fixa Essencial: Moradia, serviços públicos, convênio, escola, empréstimos.<br>
-      • Despesa Variável Essencial: Alimentação, combustível, remédios, higiene, vestuário.<br>
-      • Despesa Não Essencial: restaurantes, viagens, streaming, presentes.<br>
-      • Investimentos e Dívidas: poupança, investimentos, cartão de crédito, amortização.<br>
-      • Poupança: valores reservados para guardar.
-    </small>
+          <small>
+            Exemplos:<br>
+            • Despesa Fixa Essencial: Moradia, serviços públicos, convênio, escola, empréstimos.<br>
+            • Despesa Variável Essencial: Alimentação, combustível, remédios, higiene, vestuário.<br>
+            • Despesa Não Essencial: restaurantes, viagens, streaming, presentes.<br>
+            • Investimentos e Dívidas: poupança, investimentos, cartão de crédito, amortização.<br>
+            • Poupança: valores reservados para guardar.
+          </small>
 
-    <label for="valor">Valor (R$):</label>
-    <input type="number" id="valor" name="valor" step="0.01" min="0.01" placeholder="Ex: 150.00" required />
-    <span class="error" id="valor-error">Informe um valor maior que zero.</span>
+          <label for="valor">Valor (R$):</label>
+          <input type="number" id="valor" name="valor" step="0.01" min="0.01" placeholder="Ex: 150.00" required />
+          <span class="error" id="valor-error">Informe um valor maior que zero.</span>
 
-    <label for="data">Data:</label>
-    <input type="date" id="data" name="data" required />
-    <span class="error" id="data-error">Informe uma data válida.</span>
+          <label for="data">Data:</label>
+          <input type="date" id="data" name="data" required />
+          <span class="error" id="data-error">Informe uma data válida.</span>
 
-    <label for="categoria">Categoria:</label>
-    <input type="text" id="categoria" name="categoria" placeholder="Ex: Aluguel, Luz, Supermercado, Netflix" required />
-    <span class="error" id="categoria-error">Categoria é obrigatória.</span>
+          <label for="categoria">Categoria:</label>
+          <input type="text" id="categoria" name="categoria" placeholder="Ex: Aluguel, Luz, Supermercado, Netflix" required />
+          <span class="error" id="categoria-error">Categoria é obrigatória.</span>
 
-    <label for="descricao">Descrição:</label>
-    <textarea id="descricao" name="descricao" rows="3" placeholder="Descrição opcional"></textarea>
+          <label for="descricao">Descrição:</label>
+          <textarea id="descricao" name="descricao" rows="3" placeholder="Descrição opcional"></textarea>
 
-    <button type="submit" class="btn-submit">Adicionar à Carteira</button>
-  </form>
+          <button type="submit" class="btn-submit">Adicionar à Carteira</button>
+        </form>
+      </section>
 
-  <section id="lista-transacoes">
-    <h2>Transações da Carteira</h2>
-    <ul id="transacoes"></ul>
-  </section>
+      <!-- TELA 2: CARTEIRA (lista + resumos) -->
+      <section id="screen-carteira" class="screen">
+        <h2>Carteira</h2>
 
-  <!-- Três resumos lado a lado -->
-  <div class="resumos-container">
-    <section class="resumo-box" id="resumo-principal">
-      <h2>Resumo</h2>
-      <p><strong>Total de Receitas:</strong> <span id="total-receitas">R$ 0,00</span></p>
-      <p><strong>Total de Despesas:</strong> <span id="total-despesas">R$ 0,00</span></p>
-      <p><strong>Saldo (Receitas - Despesas):</strong> <span id="saldo">R$ 0,00</span></p>
-    </section>
+        <section id="lista-transacoes">
+          <h3>Transações da Carteira</h3>
+          <ul id="transacoes"></ul>
+        </section>
 
-    <section class="resumo-box" id="resumo-gasto">
-      <h2>Resumo de Gasto</h2>
-      <p><strong>Salário mensal informado:</strong> <span id="salario-informado">R$ 0,00</span></p>
-      <p><strong>Total Gasto:</strong> <span id="total-gasto">R$ 0,00</span></p>
-      <p><strong>Sobra do Salário:</strong> <span id="sobra-salario">R$ 0,00</span></p>
-    </section>
+        <!-- Resumos lado a lado -->
+        <div class="resumos-container">
+          <section class="resumo-box" id="resumo-principal">
+            <h2>Resumo</h2>
+            <p><strong>Total de Receitas:</strong> <span id="total-receitas">R$ 0,00</span></p>
+            <p><strong>Total de Despesas:</strong> <span id="total-despesas">R$ 0,00</span></p>
+            <p><strong>Saldo (Receitas - Despesas):</strong> <span id="saldo">R$ 0,00</span></p>
+          </section>
 
-    <section class="resumo-box" id="resumo-poupanca">
-      <h2>Resumo de Poupança</h2>
-      <p><strong>Valor adicionado (última operação):</strong> <span id="valor-adicionado-poupanca">R$ 0,00</span></p>
-      <p><strong>Total de poupança:</strong> <span id="total-poupanca">R$ 0,00</span></p>
-    </section>
+          <section class="resumo-box" id="resumo-gasto">
+            <h2>Resumo de Gasto</h2>
+            <p><strong>Salário mensal informado:</strong> <span id="salario-informado">R$ 0,00</span></p>
+            <p><strong>Total Gasto:</strong> <span id="total-gasto">R$ 0,00</span></p>
+            <p><strong>Sobra do Salário:</strong> <span id="sobra-salario">R$ 0,00</span></p>
+          </section>
+        </div>
+      </section>
+
+      <!-- TELA 3: POUPANÇA -->
+      <section id="screen-poupanca" class="screen">
+        <h2>Poupança</h2>
+        <section class="resumo-box" id="resumo-poupanca">
+          <h2>Resumo de Poupança</h2>
+          <p><strong>Valor adicionado (última operação):</strong> <span id="valor-adicionado-poupanca">R$ 0,00</span></p>
+          <p><strong>Total de poupança:</strong> <span id="total-poupanca">R$ 0,00</span></p>
+        </section>
+      </section>
+    </main>
+
+    <!-- Barra inferior de navegação -->
+    <nav class="bottom-nav">
+      <button data-target="screen-lancar" class="active">
+        <span class="icon">➕</span>
+        <span>Lançar</span>
+      </button>
+      <button data-target="screen-carteira">
+        <span class="icon">📋</span>
+        <span>Carteira</span>
+      </button>
+      <button data-target="screen-poupanca">
+        <span class="icon">💰</span>
+        <span>Poupança</span>
+      </button>
+    </nav>
   </div>
 
   <script>
     let salarioMensal = 0;
     let totalPoupanca = 0;
     let ultimoValorPoupanca = 0;
+    let transacoes = [];
 
-    // Atualiza o valor de salário quando o usuário digitar
+    // -------- Navegação entre telas --------
+    const navButtons = document.querySelectorAll('.bottom-nav button');
+    const screens = document.querySelectorAll('.screen');
+
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-target');
+
+        screens.forEach(sc => {
+          sc.classList.toggle('active', sc.id === target);
+        });
+
+        navButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // --------- Salário mensal ---------
     document.getElementById('salario-mensal').addEventListener('change', function () {
       const v = parseFloat(this.value);
       salarioMensal = isNaN(v) || v < 0 ? 0 : v;
       document.getElementById('salario-informado').textContent = `R$ ${salarioMensal.toFixed(2)}`;
+      salvarEstado();
       atualizarResumo();
     });
 
+    // --------- Formulário ---------
     document.getElementById('finance-form').addEventListener('submit', function(event) {
       event.preventDefault();
 
@@ -257,10 +434,12 @@
           document.getElementById('total-poupanca').textContent = `R$ ${totalPoupanca.toFixed(2)}`;
         }
 
+        transacoes.push(dados);
         adicionarTransacaoNaCarteira(dados);
+        salvarEstado();
         atualizarResumo();
 
-        alert('Dados validados com sucesso e adicionados à carteira (simulação).');
+        alert('Dados validados com sucesso e adicionados à carteira.');
 
         this.reset();
       }
@@ -309,8 +488,8 @@
       });
 
       const saldo = totalReceitas - totalDespesas;
-      const totalGasto = totalDespesas;                 // tudo que foi gasto
-      const sobraSalario = salarioMensal - totalGasto;  // quanto sobra do salário
+      const totalGasto = totalDespesas;
+      const sobraSalario = salarioMensal - totalGasto;
 
       // Resumo principal
       document.getElementById('total-receitas').textContent = `R$ ${totalReceitas.toFixed(2)}`;
@@ -321,7 +500,48 @@
       document.getElementById('total-gasto').textContent = `R$ ${totalGasto.toFixed(2)}`;
       document.getElementById('sobra-salario').textContent = `R$ ${sobraSalario.toFixed(2)}`;
     }
-  </script>
 
+    // --------- Persistência no localStorage ---------
+    function salvarEstado() {
+      const estado = {
+        salarioMensal,
+        totalPoupanca,
+        ultimoValorPoupanca,
+        transacoes
+      };
+      localStorage.setItem('carteiraFinanceira', JSON.stringify(estado));
+    }
+
+    function carregarEstado() {
+      const salvo = localStorage.getItem('carteiraFinanceira');
+      if (!salvo) return;
+
+      try {
+        const estado = JSON.parse(salvo);
+        salarioMensal = estado.salarioMensal || 0;
+        totalPoupanca = estado.totalPoupanca || 0;
+        ultimoValorPoupanca = estado.ultimoValorPoupanca || 0;
+        transacoes = Array.isArray(estado.transacoes) ? estado.transacoes : [];
+
+        // Atualiza campos visuais
+        document.getElementById('salario-mensal').value = salarioMensal || '';
+        document.getElementById('salario-informado').textContent = `R$ ${salarioMensal.toFixed(2)}`;
+        document.getElementById('valor-adicionado-poupanca').textContent = `R$ ${ultimoValorPoupanca.toFixed(2)}`;
+        document.getElementById('total-poupanca').textContent = `R$ ${totalPoupanca.toFixed(2)}`;
+
+        // Recria lista de transações
+        const lista = document.getElementById('transacoes');
+        lista.innerHTML = '';
+        transacoes.forEach(t => adicionarTransacaoNaCarteira(t));
+
+        atualizarResumo();
+      } catch (e) {
+        console.error('Erro ao carregar estado da carteira:', e);
+      }
+    }
+
+    // Carrega estado ao abrir a página
+    carregarEstado();
+  </script>
 </body>
 </html>
