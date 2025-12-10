@@ -102,6 +102,58 @@
       background-color: var(--amarelo-escuro);
     }
 
+    /* DASHBOARD DE CARDS */
+    .dashboard-cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .dash-card {
+      flex: 1 1 150px;
+      background: #fffde7;
+      border-radius: 6px;
+      border: 1px solid #f0e68c;
+      padding: 8px 10px;
+      font-size: 0.9em;
+    }
+
+    .dash-card-titulo {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .dash-card-valor {
+      font-size: 1.1em;
+    }
+
+    .dash-card.receita .dash-card-valor {
+      color: var(--verde);
+    }
+    .dash-card.despesa .dash-card-valor {
+      color: var(--vermelho);
+    }
+    .dash-card.poupanca .dash-card-valor {
+      color: var(--azul);
+    }
+    .dash-card.sobra .dash-card-valor {
+      color: #00695c;
+    }
+
+    /* BANNER DE ALERTA */
+    .alerta-gasto {
+      display: none;
+      margin-bottom: 10px;
+      padding: 8px 10px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      font-weight: bold;
+      background-color: #ffebee;
+      color: #c62828;
+      border: 1px solid #ffcdd2;
+    }
+
     #lista-transacoes {
       margin-top: 25px;
     }
@@ -151,10 +203,28 @@
       flex: 1;
     }
 
+    .transacao-categoria {
+      font-weight: bold;
+    }
+
+    .transacao-data {
+      font-size: 0.8em;
+      color: #777;
+    }
+
     .transacao-valor {
       font-weight: bold;
       min-width: 90px;
       text-align: right;
+    }
+    .transacao-valor.receita {
+      color: var(--verde);
+    }
+    .transacao-valor.despesa {
+      color: var(--vermelho);
+    }
+    .transacao-valor.poupanca {
+      color: var(--azul);
     }
 
     .transacao-acoes {
@@ -191,7 +261,7 @@
       flex: 1 1 250px;
       padding: 10px;
       background: #fffde7;
-      border-radius: 4px;
+      border-radius: 6px;
       border: 1px solid #f0e68c;
       font-size: 0.95em;
     }
@@ -203,6 +273,23 @@
 
     .resumo-box p {
       margin: 4px 0;
+    }
+
+    .resumo-box .linha-destaque {
+      margin-top: 6px;
+      padding: 6px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    .linha-positivo {
+      background-color: #e8f5e9;
+      color: var(--verde);
+    }
+
+    .linha-negativo {
+      background-color: #ffebee;
+      color: var(--vermelho);
     }
 
     .screen {
@@ -286,7 +373,7 @@
 
         <label for="salario-mensal">Salário mensal (R$):</label>
         <input type="number" id="salario-mensal" step="0.01" min="0" placeholder="Salário: 2500.00" />
-        <small>Este valor será considerado no resumo como referência de renda.</small>
+        <small>Este valor será considerado no relatório e no resumo de gasto.</small>
 
         <form id="finance-form" novalidate>
           <input type="hidden" id="indice-edicao" value="-1" />
@@ -308,7 +395,7 @@
             • Despesa Fixa Essencial: Moradia, serviços públicos, convênio, escola, empréstimos.<br>
             • Despesa Variável Essencial: Alimentação, combustível, remédios, higiene, vestuário.<br>
             • Despesa Não Essencial: restaurantes, viagens, streaming, presentes.<br>
-            • Investimentos e Dívidas: poupança, investimentos, cartão de crédito, amortização.<br>
+            • Investimentos e Dívidas: investimentos, cartão de crédito, amortização.<br>
             • Poupança: valores reservados para guardar.
           </small>
 
@@ -335,26 +422,61 @@
       <section id="screen-carteira" class="screen">
         <h2>Carteira</h2>
 
+        <!-- BANNER DE ALERTA -->
+        <div id="alerta-gasto" class="alerta-gasto">
+          Atenção: você já utilizou mais de 80% do salário deste mês.
+        </div>
+
+        <!-- DASHBOARD -->
+        <div class="dashboard-cards">
+          <div class="dash-card receita">
+            <div class="dash-card-titulo">Receitas</div>
+            <div class="dash-card-valor" id="card-receitas">R$ 0,00</div>
+          </div>
+          <div class="dash-card despesa">
+            <div class="dash-card-titulo">Despesas</div>
+            <div class="dash-card-valor" id="card-despesas">R$ 0,00</div>
+          </div>
+          <div class="dash-card poupanca">
+            <div class="dash-card-titulo">Poupança</div>
+            <div class="dash-card-valor" id="card-poupanca">R$ 0,00</div>
+          </div>
+          <div class="dash-card sobra">
+            <div class="dash-card-titulo">Sobra do salário</div>
+            <div class="dash-card-valor" id="card-sobra-salario">R$ 0,00</div>
+          </div>
+        </div>
+
         <section id="lista-transacoes">
           <h3>Transações da Carteira</h3>
           <ul id="transacoes"></ul>
         </section>
 
         <div class="resumos-container">
-          <section class="resumo-box" id="resumo-principal">
-            <h2>Resumo</h2>
+          <!-- RELATÓRIO DO MÊS -->
+          <section class="resumo-box" id="relatorio-mes">
+            <h2>Relatório do Mês</h2>
+
+            <p><strong>Salário mensal informado:</strong> <span id="salario-informado">R$ 0,00</span></p>
             <p><strong>Total de Receitas:</strong> <span id="total-receitas">R$ 0,00</span></p>
-            <p><strong>Total de Despesas:</strong> <span id="total-despesas">R$ 0,00</span></p>
-            <p><strong>Saldo (Receitas - Despesas):</strong> <span id="saldo">R$ 0,00</span></p>
+            <p><strong>Total de Despesas (soma de todas as despesas):</strong> <span id="total-despesas">R$ 0,00</span></p>
+            <p><strong>Poupança (total guardado):</strong> <span id="total-poupanca">R$ 0,00</span></p>
+            <p><strong>Total que saiu do bolso (despesas + poupança):</strong> <span id="total-gasto-mes">R$ 0,00</span></p>
+
+            <p class="linha-destaque linha-positivo">
+              Saldo do mês (receitas − despesas): <span id="saldo">R$ 0,00</span>
+            </p>
           </section>
 
+          <!-- RESUMO DE GASTO EM CIMA DO SALÁRIO -->
           <section class="resumo-box" id="resumo-gasto">
             <h2>Resumo de Gasto</h2>
-            <p><strong>Salário mensal informado:</strong> <span id="salario-informado">R$ 0,00</span></p>
-            <p><strong>Total Gasto:</strong> <span id="total-gasto">R$ 0,00</span></p>
+
+            <p><strong>Salário mensal informado:</strong> <span id="salario-informado-2">R$ 0,00</span></p>
+            <p><strong>Total Gasto (despesas + poupança):</strong> <span id="total-gasto">R$ 0,00</span></p>
             <p><strong>Sobra do Salário:</strong> <span id="sobra-salario">R$ 0,00</span></p>
-            <p><strong>Percentual gasto do salário:</strong> <span id="percentual-gasto">0%</span></p>
-            <p><strong>Situação:</strong> <span id="situacao-gasto" class="status-ok">OK</span></p>
+            <p><strong>Percentual gasto do salário:</strong> <span id="percentual-gasto">0,0%</span></p>
+            <p><strong>Situação:</strong> <span id="situacao-gasto" class="status-ok">Informe o salário</span></p>
           </section>
         </div>
       </section>
@@ -366,7 +488,7 @@
         <section class="resumo-box" id="resumo-poupanca">
           <h2>Resumo de Poupança</h2>
           <p><strong>Valor adicionado (última operação):</strong> <span id="valor-adicionado-poupanca">R$ 0,00</span></p>
-          <p><strong>Total de poupança:</strong> <span id="total-poupanca">R$ 0,00</span></p>
+          <p><strong>Total de poupança:</strong> <span id="total-poupanca-2">R$ 0,00</span></p>
         </section>
 
         <section id="lista-poupanca">
@@ -415,6 +537,7 @@
       const v = parseFloat(this.value);
       salarioMensal = isNaN(v) || v < 0 ? 0 : v;
       document.getElementById('salario-informado').textContent = `R$ ${salarioMensal.toFixed(2)}`;
+      document.getElementById('salario-informado-2').textContent = `R$ ${salarioMensal.toFixed(2)}`;
       salvarEstado();
       atualizarResumo();
     });
@@ -482,10 +605,12 @@
         ultimoValorPoupanca = valorNumero;
         document.getElementById('valor-adicionado-poupanca').textContent = `R$ ${ultimoValorPoupanca.toFixed(2)}`;
         document.getElementById('total-poupanca').textContent = `R$ ${totalPoupanca.toFixed(2)}`;
+        document.getElementById('total-poupanca-2').textContent = `R$ ${totalPoupanca.toFixed(2)}`;
       } else if (indiceEdicao >= 0 && transacoes[indiceEdicao].tipo === 'poupanca') {
         totalPoupanca -= transacoes[indiceEdicao].valor;
         if (totalPoupanca < 0) totalPoupanca = 0;
         document.getElementById('total-poupanca').textContent = `R$ ${totalPoupanca.toFixed(2)}`;
+        document.getElementById('total-poupanca-2').textContent = `R$ ${totalPoupanca.toFixed(2)}`;
       }
 
       if (indiceEdicao === -1) {
@@ -523,10 +648,27 @@
 
         const info = document.createElement('div');
         info.className = 'transacao-info';
-        info.textContent = `${dados.data} - ${dados.categoria}${dados.descricao ? ' - ' + dados.descricao : ''}`;
+
+        const catSpan = document.createElement('span');
+        catSpan.className = 'transacao-categoria';
+        catSpan.textContent = dados.categoria;
+
+        const dataSpan = document.createElement('span');
+        dataSpan.className = 'transacao-data';
+        dataSpan.textContent = dados.data + (dados.descricao ? ' • ' + dados.descricao : '');
+
+        info.appendChild(catSpan);
+        info.appendChild(dataSpan);
 
         const valorSpan = document.createElement('span');
         valorSpan.className = 'transacao-valor';
+        if (dados.tipo === 'receita') {
+          valorSpan.classList.add('receita');
+        } else if (dados.tipo === 'poupanca') {
+          valorSpan.classList.add('poupanca');
+        } else {
+          valorSpan.classList.add('despesa');
+        }
         valorSpan.textContent = `R$ ${dados.valor.toFixed(2)}`;
 
         const acoes = document.createElement('div');
@@ -564,10 +706,20 @@
 
         const info = document.createElement('div');
         info.className = 'transacao-info';
-        info.textContent = `${dados.data} - ${dados.categoria}${dados.descricao ? ' - ' + dados.descricao : ''}`;
+
+        const catSpan = document.createElement('span');
+        catSpan.className = 'transacao-categoria';
+        catSpan.textContent = dados.categoria;
+
+        const dataSpan = document.createElement('span');
+        dataSpan.className = 'transacao-data';
+        dataSpan.textContent = dados.data + (dados.descricao ? ' • ' + dados.descricao : '');
+
+        info.appendChild(catSpan);
+        info.appendChild(dataSpan);
 
         const valorSpan = document.createElement('span');
-        valorSpan.className = 'transacao-valor';
+        valorSpan.className = 'transacao-valor poupanca';
         valorSpan.textContent = `R$ ${dados.valor.toFixed(2)}`;
 
         const acoes = document.createElement('div');
@@ -617,6 +769,7 @@
         totalPoupanca -= t.valor;
         if (totalPoupanca < 0) totalPoupanca = 0;
         document.getElementById('total-poupanca').textContent = `R$ ${totalPoupanca.toFixed(2)}`;
+        document.getElementById('total-poupanca-2').textContent = `R$ ${totalPoupanca.toFixed(2)}`;
       }
 
       transacoes.splice(indice, 1);
@@ -626,10 +779,12 @@
       atualizarResumo();
     }
 
+    // RELATÓRIO DO MÊS + RESUMO DE GASTO
     function atualizarResumo() {
       const itens = document.querySelectorAll('#transacoes li');
       let totalReceitas = 0;
       let totalDespesas = 0;
+      let totalPoupancaGasto = 0;
 
       itens.forEach(li => {
         const valorTexto = li.querySelector('.transacao-valor').textContent.replace('R$','').trim();
@@ -639,26 +794,41 @@
           totalReceitas += valor;
         } else if (li.classList.contains('despesa')) {
           totalDespesas += valor;
+        } else if (li.classList.contains('poupanca')) {
+          totalPoupancaGasto += valor;
         }
       });
 
       const saldo = totalReceitas - totalDespesas;
-      const totalGasto = totalDespesas;
-      const sobraSalario = salarioMensal - totalGasto;
+      const totalGastoMes = totalDespesas;              // só despesas
+      const totalGastoSalario = totalDespesas + totalPoupancaGasto; // despesas + poupança
+      const sobraSalario = salarioMensal - totalGastoSalario;
 
+      // Relatório do mês
       document.getElementById('total-receitas').textContent = `R$ ${totalReceitas.toFixed(2)}`;
       document.getElementById('total-despesas').textContent = `R$ ${totalDespesas.toFixed(2)}`;
       document.getElementById('saldo').textContent = `R$ ${saldo.toFixed(2)}`;
+      document.getElementById('total-poupanca').textContent = `R$ ${totalPoupanca.toFixed(2)}`;
+      document.getElementById('total-poupanca-2').textContent = `R$ ${totalPoupanca.toFixed(2)}`;
+      document.getElementById('total-gasto-mes').textContent = `R$ ${totalGastoSalario.toFixed(2)}`;
 
-      document.getElementById('total-gasto').textContent = `R$ ${totalGasto.toFixed(2)}`;
+      // Resumo de gasto em cima do salário
+      document.getElementById('total-gasto').textContent = `R$ ${totalGastoSalario.toFixed(2)}`;
       document.getElementById('sobra-salario').textContent = `R$ ${sobraSalario.toFixed(2)}`;
+
+      // Atualiza cards do dashboard
+      document.getElementById('card-receitas').textContent = `R$ ${totalReceitas.toFixed(2)}`;
+      document.getElementById('card-despesas').textContent = `R$ ${totalDespesas.toFixed(2)}`;
+      document.getElementById('card-poupanca').textContent = `R$ ${totalPoupanca.toFixed(2)}`;
+      document.getElementById('card-sobra-salario').textContent = `R$ ${sobraSalario.toFixed(2)}`;
 
       let percentual = 0;
       if (salarioMensal > 0) {
-        percentual = (totalGasto / salarioMensal) * 100;
+        percentual = (totalGastoSalario / salarioMensal) * 100;
       }
       const percentualEl = document.getElementById('percentual-gasto');
       const situacaoEl = document.getElementById('situacao-gasto');
+      const alertaGasto = document.getElementById('alerta-gasto');
 
       percentualEl.textContent = `${percentual.toFixed(1)}%`;
 
@@ -667,15 +837,19 @@
       if (salarioMensal <= 0) {
         situacaoEl.textContent = 'Informe o salário';
         situacaoEl.classList.add('status-critico');
+        alertaGasto.style.display = 'none';
       } else if (percentual <= 50) {
         situacaoEl.textContent = 'OK';
         situacaoEl.classList.add('status-ok');
+        alertaGasto.style.display = 'none';
       } else if (percentual <= 80) {
         situacaoEl.textContent = 'Atenção';
         situacaoEl.classList.add('status-atencao');
+        alertaGasto.style.display = 'none';
       } else {
         situacaoEl.textContent = 'Crítico';
         situacaoEl.classList.add('status-critico');
+        alertaGasto.style.display = 'block';
       }
     }
 
@@ -702,8 +876,10 @@
 
         document.getElementById('salario-mensal').value = salarioMensal || '';
         document.getElementById('salario-informado').textContent = `R$ ${salarioMensal.toFixed(2)}`;
+        document.getElementById('salario-informado-2').textContent = `R$ ${salarioMensal.toFixed(2)}`;
         document.getElementById('valor-adicionado-poupanca').textContent = `R$ ${ultimoValorPoupanca.toFixed(2)}`;
         document.getElementById('total-poupanca').textContent = `R$ ${totalPoupanca.toFixed(2)}`;
+        document.getElementById('total-poupanca-2').textContent = `R$ ${totalPoupanca.toFixed(2)}`;
 
         renderizarTransacoes();
         renderizarPoupancaLancamentos();
