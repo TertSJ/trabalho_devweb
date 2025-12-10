@@ -8,7 +8,7 @@
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
-      max-width: 600px;
+      max-width: 900px;
       background-color: #fff9c4; /* amarelo bem claro */
     }
     h1 {
@@ -50,8 +50,7 @@
     #lista-transacoes {
       margin-top: 25px;
     }
-    #lista-transacoes h2,
-    #resumo h2 {
+    #lista-transacoes h2 {
       margin-top: 20px;
       margin-bottom: 8px;
     }
@@ -76,15 +75,30 @@
     #lista-transacoes li.despesa {
       border-left: 4px solid red;
     }
-    #resumo {
+    #lista-transacoes li.poupanca {
+      border-left: 4px solid blue;
+    }
+
+    /* Container para colocar os resumos lado a lado */
+    .resumos-container {
+      display: flex;
+      gap: 16px;
       margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .resumo-box {
+      flex: 1 1 250px;
       padding: 10px;
       background: #fffde7;
       border-radius: 4px;
       border: 1px solid #f0e68c;
       font-size: 0.95em;
     }
-    #resumo p {
+    .resumo-box h2 {
+      margin-top: 0;
+      margin-bottom: 8px;
+    }
+    .resumo-box p {
       margin: 4px 0;
     }
   </style>
@@ -104,11 +118,14 @@
       <option value="">Selecione</option>
       <option value="receita">Receita</option>
 
-      <!-- Novos tipos de despesas -->
+      <!-- Tipos de despesas -->
       <option value="despesa_fixa_essencial">Despesa Fixa Essencial</option>
       <option value="despesa_variavel_essencial">Despesa Variável Essencial</option>
       <option value="despesa_nao_essencial">Despesa Não Essencial (Lazer)</option>
       <option value="investimento_divida">Investimentos e Dívidas</option>
+
+      <!-- Novo tipo: Poupança -->
+      <option value="poupanca">Poupança</option>
     </select>
     <span class="error" id="tipo-error">Por favor, selecione o tipo.</span>
 
@@ -117,7 +134,8 @@
       • Despesa Fixa Essencial: Moradia, serviços públicos, convênio, escola, empréstimos.<br>
       • Despesa Variável Essencial: Alimentação, combustível, remédios, higiene, vestuário.<br>
       • Despesa Não Essencial: restaurantes, viagens, streaming, presentes.<br>
-      • Investimentos e Dívidas: poupança, investimentos, cartão de crédito, amortização.
+      • Investimentos e Dívidas: poupança, investimentos, cartão de crédito, amortização.<br>
+      • Poupança: valores reservados para guardar.
     </small>
 
     <label for="valor">Valor (R$):</label>
@@ -143,22 +161,40 @@
     <ul id="transacoes"></ul>
   </section>
 
-  <section id="resumo">
-    <h2>Resumo</h2>
-    <p><strong>Salário mensal informado:</strong> <span id="salario-informado">R$ 0,00</span></p>
-    <p><strong>Total de Receitas:</strong> <span id="total-receitas">R$ 0,00</span></p>
-    <p><strong>Total de Despesas:</strong> <span id="total-despesas">R$ 0,00</span></p>
-    <p><strong>Saldo:</strong> <span id="saldo">R$ 0,00</span></p>
-  </section>
+  <!-- Três resumos lado a lado -->
+  <div class="resumos-container">
+    <section class="resumo-box" id="resumo-principal">
+      <h2>Resumo</h2>
+      <p><strong>Total de Receitas:</strong> <span id="total-receitas">R$ 0,00</span></p>
+      <p><strong>Total de Despesas:</strong> <span id="total-despesas">R$ 0,00</span></p>
+      <p><strong>Saldo (Receitas - Despesas):</strong> <span id="saldo">R$ 0,00</span></p>
+    </section>
+
+    <section class="resumo-box" id="resumo-gasto">
+      <h2>Resumo de Gasto</h2>
+      <p><strong>Salário mensal informado:</strong> <span id="salario-informado">R$ 0,00</span></p>
+      <p><strong>Total Gasto:</strong> <span id="total-gasto">R$ 0,00</span></p>
+      <p><strong>Sobra do Salário:</strong> <span id="sobra-salario">R$ 0,00</span></p>
+    </section>
+
+    <section class="resumo-box" id="resumo-poupanca">
+      <h2>Resumo de Poupança</h2>
+      <p><strong>Valor adicionado (última operação):</strong> <span id="valor-adicionado-poupanca">R$ 0,00</span></p>
+      <p><strong>Total de poupança:</strong> <span id="total-poupanca">R$ 0,00</span></p>
+    </section>
+  </div>
 
   <script>
     let salarioMensal = 0;
+    let totalPoupanca = 0;
+    let ultimoValorPoupanca = 0;
 
     // Atualiza o valor de salário quando o usuário digitar
     document.getElementById('salario-mensal').addEventListener('change', function () {
       const v = parseFloat(this.value);
       salarioMensal = isNaN(v) || v < 0 ? 0 : v;
       document.getElementById('salario-informado').textContent = `R$ ${salarioMensal.toFixed(2)}`;
+      atualizarResumo();
     });
 
     document.getElementById('finance-form').addEventListener('submit', function(event) {
@@ -203,13 +239,23 @@
       }
 
       if (formIsValid) {
+        const valorNumero = parseFloat(valor.value);
+
         const dados = {
           tipo: tipo.value,
-          valor: parseFloat(valor.value),
+          valor: valorNumero,
           data: data.value,
           categoria: categoria.value.trim(),
           descricao: document.getElementById('descricao').value.trim()
         };
+
+        // Atualiza controle de poupança se o tipo for poupança
+        if (dados.tipo === 'poupanca') {
+          ultimoValorPoupanca = valorNumero;
+          totalPoupanca += valorNumero;
+          document.getElementById('valor-adicionado-poupanca').textContent = `R$ ${ultimoValorPoupanca.toFixed(2)}`;
+          document.getElementById('total-poupanca').textContent = `R$ ${totalPoupanca.toFixed(2)}`;
+        }
 
         adicionarTransacaoNaCarteira(dados);
         atualizarResumo();
@@ -222,11 +268,16 @@
 
     function adicionarTransacaoNaCarteira(dados) {
       const lista = document.getElementById('transacoes');
-
       const li = document.createElement('li');
 
-      // Visual: receita em verde, todo o resto tratado como despesa
-      li.classList.add(dados.tipo === 'receita' ? 'receita' : 'despesa');
+      // Visual: receita em verde, poupança em azul, resto como despesa
+      if (dados.tipo === 'receita') {
+        li.classList.add('receita');
+      } else if (dados.tipo === 'poupanca') {
+        li.classList.add('poupanca');
+      } else {
+        li.classList.add('despesa');
+      }
 
       const textoLeft = document.createElement('span');
       textoLeft.textContent = `${dados.data} - ${dados.categoria}${dados.descricao ? ' - ' + dados.descricao : ''}`;
@@ -254,13 +305,21 @@
         } else if (li.classList.contains('despesa')) {
           totalDespesas += valor;
         }
+        // Poupança não entra em receitas nem em despesas aqui
       });
 
       const saldo = totalReceitas - totalDespesas;
+      const totalGasto = totalDespesas;                 // tudo que foi gasto
+      const sobraSalario = salarioMensal - totalGasto;  // quanto sobra do salário
 
+      // Resumo principal
       document.getElementById('total-receitas').textContent = `R$ ${totalReceitas.toFixed(2)}`;
       document.getElementById('total-despesas').textContent = `R$ ${totalDespesas.toFixed(2)}`;
       document.getElementById('saldo').textContent = `R$ ${saldo.toFixed(2)}`;
+
+      // Resumo de gasto
+      document.getElementById('total-gasto').textContent = `R$ ${totalGasto.toFixed(2)}`;
+      document.getElementById('sobra-salario').textContent = `R$ ${sobraSalario.toFixed(2)}`;
     }
   </script>
 
