@@ -9,6 +9,16 @@
       font-family: Arial, sans-serif;
       margin: 20px;
       max-width: 600px;
+      background-color: #fff9c4; /* amarelo bem claro */
+    }
+    h1 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    h1::before {
+      content: "💳"; /* ícone de carteira/cartão */
+      font-size: 1.4em;
     }
     label {
       display: block;
@@ -28,19 +38,65 @@
     .btn-submit {
       margin-top: 15px;
       padding: 10px 15px;
-      background-color: #0275d8;
+      background-color: #fbc02d; /* amarelo mais forte */
       border: none;
-      color: white;
+      color: #333;
       cursor: pointer;
+      font-weight: bold;
     }
     .btn-submit:hover {
-      background-color: #025aa5;
+      background-color: #f9a825;
+    }
+    #lista-transacoes {
+      margin-top: 25px;
+    }
+    #lista-transacoes h2,
+    #resumo h2 {
+      margin-top: 20px;
+      margin-bottom: 8px;
+    }
+    #lista-transacoes ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    #lista-transacoes li {
+      background: #fffde7;
+      border: 1px solid #f0e68c;
+      border-radius: 4px;
+      padding: 8px;
+      margin-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.95em;
+    }
+    #lista-transacoes li.receita {
+      border-left: 4px solid green;
+    }
+    #lista-transacoes li.despesa {
+      border-left: 4px solid red;
+    }
+    #resumo {
+      margin-top: 20px;
+      padding: 10px;
+      background: #fffde7;
+      border-radius: 4px;
+      border: 1px solid #f0e68c;
+      font-size: 0.95em;
+    }
+    #resumo p {
+      margin: 4px 0;
     }
   </style>
 </head>
 <body>
 
-  <h1>Controle Financeiro Pessoal</h1>
+  <h1>Carteira de Controle Financeiro</h1>
+
+  <!-- Campo para armazenar o salário mensal -->
+  <label for="salario-mensal">Salário mensal (R$):</label>
+  <input type="number" id="salario-mensal" step="0.01" min="0" placeholder="Salario: 2500.00" />
+  <small>Este valor será considerado no resumo como referência de renda.</small>
 
   <form id="finance-form" novalidate>
     <label for="tipo">Tipo:</label>
@@ -66,16 +122,37 @@
     <label for="descricao">Descrição:</label>
     <textarea id="descricao" name="descricao" rows="3" placeholder="Descrição opcional"></textarea>
 
-    <button type="submit" class="btn-submit">Adicionar</button>
+    <button type="submit" class="btn-submit">Adicionar à Carteira</button>
   </form>
 
+  <section id="lista-transacoes">
+    <h2>Transações da Carteira</h2>
+    <ul id="transacoes"></ul>
+  </section>
+
+  <section id="resumo">
+    <h2>Resumo</h2>
+    <p><strong>Salário mensal informado:</strong> <span id="salario-informado">R$ 0,00</span></p>
+    <p><strong>Total de Receitas:</strong> <span id="total-receitas">R$ 0,00</span></p>
+    <p><strong>Total de Despesas:</strong> <span id="total-despesas">R$ 0,00</span></p>
+    <p><strong>Saldo:</strong> <span id="saldo">R$ 0,00</span></p>
+  </section>
+
   <script>
+    let salarioMensal = 0;
+
+    // Atualiza o valor de salário quando o usuário digitar
+    document.getElementById('salario-mensal').addEventListener('change', function () {
+      const v = parseFloat(this.value);
+      salarioMensal = isNaN(v) || v < 0 ? 0 : v;
+      document.getElementById('salario-informado').textContent = `R$ ${salarioMensal.toFixed(2)}`;
+    });
+
     document.getElementById('finance-form').addEventListener('submit', function(event) {
       event.preventDefault();
 
       let formIsValid = true;
 
-      // tipo
       const tipo = document.getElementById('tipo');
       const tipoError = document.getElementById('tipo-error');
       if (tipo.value === '') {
@@ -85,7 +162,6 @@
         tipoError.style.display = 'none';
       }
 
-      // valor
       const valor = document.getElementById('valor');
       const valorError = document.getElementById('valor-error');
       if (valor.value === '' || parseFloat(valor.value) <= 0) {
@@ -95,7 +171,6 @@
         valorError.style.display = 'none';
       }
 
-      // data
       const data = document.getElementById('data');
       const dataError = document.getElementById('data-error');
       if (data.value === '') {
@@ -105,7 +180,6 @@
         dataError.style.display = 'none';
       }
 
-      // categoria
       const categoria = document.getElementById('categoria');
       const categoriaError = document.getElementById('categoria-error');
       if (categoria.value.trim() === '') {
@@ -115,24 +189,64 @@
         categoriaError.style.display = 'none';
       }
 
-      // Se tudo estiver válido, por enquanto apenas exibir os dados no console
       if (formIsValid) {
         const dados = {
           tipo: tipo.value,
-          valor: parseFloat(valor.value).toFixed(2),
+          valor: parseFloat(valor.value),
           data: data.value,
           categoria: categoria.value.trim(),
           descricao: document.getElementById('descricao').value.trim()
         };
-        console.log('Dados a cadastrar:', dados);
-        alert('Dados validados com sucesso! Agora você pode enviar ao servidor.');
 
-        // Aqui você pode adicionar código para enviar os dados ao back-end via fetch/AJAX
+        adicionarTransacaoNaCarteira(dados);
+        atualizarResumo();
 
-        // Resetar formulário após envio
+        alert('Dados validados com sucesso e adicionados à carteira (simulação).');
+
         this.reset();
       }
     });
+
+    function adicionarTransacaoNaCarteira(dados) {
+      const lista = document.getElementById('transacoes');
+
+      const li = document.createElement('li');
+      li.classList.add(dados.tipo);
+
+      const textoLeft = document.createElement('span');
+      textoLeft.textContent = `${dados.data} - ${dados.categoria}${dados.descricao ? ' - ' + dados.descricao : ''}`;
+
+      const textoRight = document.createElement('span');
+      textoRight.textContent = `R$ ${dados.valor.toFixed(2)}`;
+
+      li.appendChild(textoLeft);
+      li.appendChild(textoRight);
+
+      lista.appendChild(li);
+    }
+
+    function atualizarResumo() {
+      const itens = document.querySelectorAll('#transacoes li');
+      let totalReceitas = 0;
+      let totalDespesas = 0;
+
+      itens.forEach(li => {
+        const valorTexto = li.querySelector('span:last-child').textContent.replace('R$','').trim();
+        const valor = parseFloat(valorTexto.replace(',', '.')) || 0;
+
+        if (li.classList.contains('receita')) {
+          totalReceitas += valor;
+        } else if (li.classList.contains('despesa')) {
+          totalDespesas += valor;
+        }
+      });
+
+      const saldo = totalReceitas - totalDespesas;
+
+      document.getElementById('total-receitas').textContent = `R$ ${totalReceitas.toFixed(2)}`;
+      document.getElementById('total-despesas').textContent = `R$ ${totalDespesas.toFixed(2)}`;
+      document.getElementById('saldo').textContent = `R$ ${saldo.toFixed(2)}`;
+    }
   </script>
 
 </body>
