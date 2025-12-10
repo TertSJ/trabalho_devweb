@@ -56,7 +56,7 @@ echo "Hoje é $hoje";
 $mes = date('m');
 $ano = date('Y');
 $sql_transacoes = "SELECT * FROM transacoes 
-                   WHERE usuario_id = $usuario_id AND Date_FORMAT(data, '%m-%Y') = '$mes-$ano' 
+                   WHERE usuario_id = $usuario_id
                    ORDER BY data DESC, id DESC";
 $result_transacoes = $conexao->query($sql_transacoes);
 $transacoes = [];
