@@ -49,7 +49,7 @@ $nomeUsuario = $_SESSION['nome'];
         <div class="card text-white bg-success">
           <div class="card-body">
             <h5 class="card-title"><i class="fas fa-arrow-up me-2"></i>Receitas</h5>
-            <h3 class="card-text">R$ <?php echo number_format($totais['receitas'], 2, ',', '.'); ?></h3>
+            <h3 class="card-text">R$ <?php echo number_format($totais_mes['receitas'], 2, ',', '.'); ?></h3>
           </div>
         </div>
       </div>
@@ -57,15 +57,15 @@ $nomeUsuario = $_SESSION['nome'];
         <div class="card text-white bg-danger">
           <div class="card-body">
             <h5 class="card-title"><i class="fas fa-arrow-down me-2"></i>Despesas</h5>
-            <h3 class="card-text">R$ <?php echo number_format($totais['despesas'], 2, ',', '.'); ?></h3>
+            <h3 class="card-text">R$ <?php echo number_format($totais_mes['despesas'], 2, ',', '.'); ?></h3>
           </div>
         </div>
       </div>
       <div class="col-md-4">
-        <div class="card text-white <?php echo $totais['saldo'] >= 0 ? 'bg-info' : 'bg-warning'; ?>">
+        <div class="card text-white <?php echo $totais_mes['saldo'] >= 0 ? 'bg-info' : 'bg-warning'; ?>">
           <div class="card-body">
             <h5 class="card-title"><i class="fas fa-balance-scale me-2"></i>Saldo</h5>
-            <h3 class="card-text">R$ <?php echo number_format($totais['saldo'], 2, ',', '.'); ?></h3>
+            <h3 class="card-text">R$ <?php echo number_format($totais_mes['saldo'], 2, ',', '.'); ?></h3>
           </div>
         </div>
       </div>
@@ -142,7 +142,8 @@ $nomeUsuario = $_SESSION['nome'];
                 </tr>
               </thead>
               <tbody>
-                <?php foreach ($transacoes as $transacao): ?>
+                <?php foreach ($transacoes as $transacao): 
+                ?>
                 <tr>
                   <td><?php echo date('d/m/Y', strtotime($transacao['data'])); ?></td>
                   <td>

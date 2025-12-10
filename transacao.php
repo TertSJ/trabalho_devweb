@@ -51,9 +51,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-
+$hoje = date('Y-m-d');
+echo "Hoje é $hoje";
+$mes = date('m');
+$ano = date('Y');
 $sql_transacoes = "SELECT * FROM transacoes 
-                   WHERE usuario_id = $usuario_id 
+                   WHERE usuario_id = $usuario_id AND Date_FORMAT(data, '%m-%Y') = '$mes-$ano' 
                    ORDER BY data DESC, id DESC";
 $result_transacoes = $conexao->query($sql_transacoes);
 $transacoes = [];
@@ -64,8 +67,23 @@ if ($result_transacoes) {
 }
 
 // Calcular totais
-$hoje = date('Y-m-d');
-echo "Hoje é $hoje";
+
+$sql_totais_mes = "SELECT 
+                    SUM(CASE WHEN tipo = 'receita' THEN valor ELSE 0 END) as receitas,
+                    SUM(CASE WHEN tipo = 'despesa' THEN valor ELSE 0 END) as despesas
+                   FROM transacoes 
+                   WHERE usuario_id = $usuario_id 
+                   AND MONTH(data) = $mes 
+                   AND YEAR(data) = $ano";
+$result_totais_mes = $conexao->query($sql_totais_mes);
+$totais_mes_row = $result_totais_mes->fetch_assoc();
+$totais_mes = [
+    'receitas' => $totais_mes_row['receitas'] ?? 0,
+    'despesas' => $totais_mes_row['despesas'] ?? 0,
+    'saldo' => ($totais_mes_row['receitas'] ?? 0) - ($totais_mes_row['despesas'] ?? 0)
+];
+
+
 $sql_totais = "SELECT 
                 SUM(CASE WHEN tipo = 'receita' THEN valor ELSE 0 END) as receitas,
                 SUM(CASE WHEN tipo = 'despesa' THEN valor ELSE 0 END) as despesas
