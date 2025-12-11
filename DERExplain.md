@@ -1,53 +1,94 @@
-Este diagrama representa o modelo de dados (DER - Diagrama Entidade-Relacionamento) de um **Sistema de Gestão Financeira Pessoal**. Ele mostra como o banco de dados está estruturado para permitir que usuários controlem gastos, criem orçamentos e definam metas de economia.
+# Estrutura do Banco de Dados - Sistema de Controle Financeiro
 
-Aqui está uma explicação detalhada de cada parte do diagrama:
+Este documento explica a estrutura atual do banco de dados implementado no sistema.
 
-### 1. Entidade Central: USER (Usuário)
-A tabela rosa (`USER`) é o coração do sistema. Quase todas as outras tabelas se conectam a ela.
-*   **Função:** Armazena as informações das pessoas que utilizam o sistema.
-*   **Dados:** ID (Chave Primária), nome, email, hash da senha (para segurança), tipo de usuário (userType) e data de criação.
-*   **Relacionamentos:** Um usuário pode ter múltiplas transações, orçamentos, metas, contribuições e notificações.
+## Tabelas Implementadas
 
-### 2. Gestão de Gastos e Receitas
-Estas duas tabelas controlam o fluxo diário de dinheiro:
+### 1. Tabela: usuarios
+**Função:** Armazena os dados dos usuários do sistema.
 
-*   **TRANSACTION (Transação - Laranja):**
-    *   Registra cada movimentação financeira (compras, pagamentos, salários).
-    *   Contém o valor (`amount`), data, descrição e método de pagamento.
-    *   **Conexões:** Está ligada ao `USER` (quem gastou) e à `CATEGORY` (do que se trata o gasto).
-*   **CATEGORY (Categoria - Azul Petróleo):**
-    *   Serve para classificar as transações (ex: "Alimentação", "Transporte", "Salário").
-    *   Contém o nome e o tipo (provavelmente receita ou despesa).
-    *   **Conexões:** É criada por um `USER` e usada para classificar `TRANSACTION` e definir `BUDGET`.
+**Campos:**
+- `id` (INT, AUTO_INCREMENT, PRIMARY KEY) - Identificador único
+- `nome` (VARCHAR(100)) - Nome completo do usuário
+- `email` (VARCHAR(100), UNIQUE) - Email para login (único)
+- `senha` (VARCHAR(255)) - Senha do usuário
+- `data_criacao` (TIMESTAMP) - Data de criação da conta
 
-### 3. Planejamento e Controle
-*   **BUDGET (Orçamento - Azul Claro):**
-    *   Define limites de gastos.
-    *   **Lógica:** O usuário define um valor limite (`amountLimit`) para um mês e ano específicos, atrelado a uma categoria específica.
-    *   **Exemplo:** O usuário define que pode gastar no máximo R$ 500,00 (amountLimit) em "Lazer" (categoryId) em Dezembro (month) de 2023 (year).
+**Relacionamentos:** Um usuário pode ter muitas transações (1:N)
 
-### 4. Metas de Poupança
-Estas tabelas gerenciam objetivos de longo prazo (como comprar um carro ou fazer uma viagem):
+### 2. Tabela: transacoes
+**Função:** Registra todas as movimentações financeiras dos usuários.
 
-*   **FINANCIAL_GOAL (Meta Financeira - Verde Claro):**
-    *   Define o objetivo.
-    *   Contém o valor alvo (`targetAmount`), o valor já economizado (`currentAmount`) e a data limite (`deadline`).
-*   **CONTRIBUTION (Contribuição - Roxo):**
-    *   Registra os depósitos feitos especificamente para uma meta.
-    *   Diferente de uma transação comum, esta tabela liga o dinheiro diretamente a um `goalId` (ID da Meta).
-    *   **Conexões:** Um usuário faz uma contribuição que financia ("funds") uma meta financeira.
+**Campos:**
+- `id` (INT, AUTO_INCREMENT, PRIMARY KEY) - Identificador único
+- `usuario_id` (INT, FOREIGN KEY) - Referência ao usuário
+- `tipo` (ENUM: 'receita', 'despesa') - Tipo da transação
+- `valor` (DECIMAL(10,2)) - Valor da transação
+- `data` (DATE) - Data da transação
+- `categoria` (VARCHAR(100)) - Categoria da transação
+- `descricao` (TEXT) - Descrição opcional
+- `data_criacao` (TIMESTAMP) - Data de registro no sistema
 
-### 5. Sistema de Avisos
-*   **NOTIFICATION (Notificação - Vermelho):**
-    *   Armazena alertas para o usuário (ex: "Você excedeu seu orçamento" ou "Meta atingida").
-    *   Possui o status de leitura (`isRead`) e a mensagem.
+**Relacionamentos:** 
+- Pertence a um usuário (N:1)
+- Chave estrangeira: `usuario_id` → `usuarios.id`
 
-### Resumo dos Relacionamentos (Cardinalidade)
-A notação "pé de galinha" (as linhas que conectam as caixas) indica o seguinte padrão predominante: **Um para Muitos (1:N)**.
+## Relacionamentos
 
-*   **1 Usuário** pode ter **Muitas** Transações.
-*   **1 Categoria** pode ter **Muitas** Transações.
-*   **1 Meta Financeira** pode receber **Muitas** Contribuições.
-*   **1 Usuário** define **Muitos** Orçamentos.
+```
+usuarios (1) ←→ (N) transacoes
+```
 
-Em resumo, este banco de dados permite que um aplicativo diga ao usuário: "Você gastou X em Alimentação este mês, o que é Y% do seu orçamento planejado, e você já economizou Z para sua viagem de férias."
+**Explicação:**
+- Um usuário pode ter múltiplas transações
+- Cada transação pertence a apenas um usuário
+- Ao excluir um usuário, suas transações são excluídas automaticamente (CASCADE)
+
+## Funcionalidades do Sistema
+
+### Cadastro e Autenticação
+- Usuários se cadastram com nome, email e senha
+- Email deve ser único no sistema
+- Login realizado com email e senha
+
+### Transações
+- Usuários registram receitas e despesas
+- Cada transação tem valor, data, categoria e descrição opcional
+- Sistema calcula automaticamente:
+  - Total de receitas
+  - Total de despesas  
+  - Saldo (receitas - despesas)
+
+### Segurança
+- Cada usuário só acessa suas próprias transações
+- Validação de sessão em todas as páginas protegidas
+- Escape de strings SQL para prevenir injection
+
+## SQL de Criação
+
+```sql
+-- Tabela de usuários
+CREATE TABLE usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabela de transações
+CREATE TABLE transacoes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    tipo ENUM('receita', 'despesa') NOT NULL,
+    valor DECIMAL(10, 2) NOT NULL,
+    data DATE NOT NULL,
+    categoria VARCHAR(100) NOT NULL,
+    descricao TEXT,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+```
+
+## Resumo
+Este banco de dados simples e eficiente permite que o sistema registre transações financeiras de múltiplos usuários, mantendo os dados organizados e seguros. A estrutura atual suporta todas as funcionalidades implementadas no sistema.
